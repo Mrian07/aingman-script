@@ -96,6 +96,7 @@ rm -rf ws-stunnel
 rm-rf m-usernew-ssh
 rm-rf m-usernew-vmess
 rm-rf m-usernew-vless
+rm-rf m-usernew-tr
 
 fun_bar() {
     CMD[0]="$1"
@@ -161,6 +162,7 @@ wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-s
 wget -q -O /usr/bin/m-usernew-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh.sh" && chmod +x /usr/bin/m-usernew-ssh
 wget -q -O /usr/bin/m-usernew-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess.sh" && chmod +x /usr/bin/m-usernew-vmess
 wget -q -O /usr/bin/m-usernew-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless.sh" && chmod +x /usr/bin/m-usernew-vless
+wget -q -O /usr/bin/m-usernew-tr "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr.sh" && chmod +x /usr/bin/m-usernew-tr
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
@@ -194,6 +196,7 @@ chmod +x ws-stunnel
 chmod +x m-usernew-ssh
 chmod +x m-usernew-vmess
 chmod +x m-usernew-vless
+chmod +x m-usernew-tr
 clear
 
 }
