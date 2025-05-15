@@ -126,7 +126,7 @@ fun_bar() {
 }
 res1() {
     
-wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu.sh" && chmod +x /usr/bin/menu
+wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu-lion.sh" && chmod +x /usr/bin/menu
 wget -q -O /usr/bin/m-trgo "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-trgo.sh" && chmod +x /usr/bin/m-trgo
 wget -q -O /usr/bin/restore "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/restore.sh" && chmod +x /usr/bin/restore
 wget -q -O /usr/bin/backup "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/backup.sh" && chmod +x /usr/bin/backup
