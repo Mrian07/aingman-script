@@ -311,7 +311,13 @@ function add_subdomain() {
 
         # Tambahkan subdomain ke file yang digunakan oleh rmbl.sh
         echo "$sub" > /root/subdomainadd
-        echo "$sub" >> /root/subdomainall
+
+        # Tambahkan subdomain ke string yang diformat
+        if [ -z "$formatted_subdomains" ]; then
+            formatted_subdomains="$sub"
+        else
+            formatted_subdomains="$formatted_subdomains,$sub"
+        fi
 
         # Unduh dan jalankan skrip rmbl.sh
         wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/subdomain-lion.sh -O /tmp/subdomain-lion.sh
@@ -328,6 +334,7 @@ function add_subdomain() {
         # Tampilkan pesan sukses untuk setiap subdomain
         echo "Subdomain $sub dan entri Rotating Proxy Berhasil Dibuat."
     done
+    echo "$formatted_subdomains" > /root/subdomainall
 }
 
 # Fungsi untuk menampilkan progress bar
