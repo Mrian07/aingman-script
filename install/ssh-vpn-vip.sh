@@ -326,7 +326,7 @@ echo "Banner /etc/issue.net" >>/etc/ssh/sshd_config
 sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/issue.net"@g' /etc/default/dropbear
 
 # Ganti Banner
-wget -O /etc/issue.net "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/issue.net"
+wget -O /etc/issue.net "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwsss/issue.net"
 
 #install bbr dan optimasi kernel
 wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/bbr.sh && chmod +x bbr.sh && ./bbr.sh
@@ -364,7 +364,7 @@ netfilter-persistent reload
 
 # download script
 cd /usr/bin
-wget -O issue "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/issue.net"
+wget -O issue "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwsss/issue.net"
 wget -O m-theme "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-theme.sh"
 wget -O speedtest "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/speedtest_cli.py"
 wget -O xp "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/xp.sh"
