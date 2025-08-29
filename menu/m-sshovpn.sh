@@ -646,34 +646,59 @@ echo -e "$COLOR1│${NC}              ${WH}• DELETE USERS •                 
 echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
 echo -e " "
 echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
-echo -e "$COLOR1│ ${WH}Silahkan Pilih User Yang Mau Didelete     $COLOR1      │"
-echo -e "$COLOR1│ ${WH}ketik [0] kembali kemenu                     $COLOR1   │"
+echo -e "$COLOR1│ ${WH}Pilih mode delete:                           $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[1] Single User Delete                       $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[2] Multiple Users Delete                    $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[0] Kembali ke menu                          $COLOR1    │"
 echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
-grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2-3 | nl -s ') '
-until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-if [[ ${CLIENT_NUMBER} == '1' ]]; then
-read -rp "Select one client [1]: " CLIENT_NUMBER
-else
-read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
-if [[ ${CLIENT_NUMBER} == '0' ]]; then
-m-sshovpn
-fi
-fi
-done
-Pengguna=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-Days=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-Pass=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 4 | sed -n "${CLIENT_NUMBER}"p)
-sed -i "/^### $Pengguna $Days $Pass/d" /etc/xray/ssh
-rm /home/vps/public_html/ssh-$Pengguna.txt >/dev/null 2>&1
-rm /etc/xray/sshx/${Pengguna}IP >/dev/null 2>&1
-rm /etc/xray/sshx/${Pengguna}login >/dev/null 2>&1
-if getent passwd $Pengguna > /dev/null 2>&1; then
-userdel $Pengguna > /dev/null 2>&1
-echo -e "User $Pengguna was removed."
-else
-echo -e "Failure: User $Pengguna Not Exist."
-fi
-TEXT="
+read -rp "Pilih mode [1-2]: " delete_mode
+
+if [[ $delete_mode == "0" ]]; then
+    m-sshovpn
+elif [[ $delete_mode == "1" ]]; then
+    # SINGLE USER DELETE
+    clear
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│${NC}              ${WH}• DELETE SINGLE USER •             │${NC}$COLOR1$NC"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    echo -e " "
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│ ${WH}Silahkan Pilih User Yang Mau Didelete       $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}ketik [0] kembali kemenu                     $COLOR1   │"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2-3 | nl -s ') '
+    until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
+    if [[ ${CLIENT_NUMBER} == '1' ]]; then
+    read -rp "Select one client [1]: " CLIENT_NUMBER
+    else
+    read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+    if [[ ${CLIENT_NUMBER} == '0' ]]; then
+    m-sshovpn
+    fi
+    fi
+    done
+    Pengguna=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
+    Days=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
+    Pass=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 4 | sed -n "${CLIENT_NUMBER}"p)
+
+    # Konfirmasi delete
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│ ${WH}Konfirmasi Delete User: ${WH}$Pengguna             $COLOR1│"
+    echo -e "$COLOR1│ ${WH}Expired: $Days                               $COLOR1│"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    read -rp "Yakin ingin delete user ini? [y/n]: " confirm
+    if [[ $confirm =~ ^[Yy]$ ]]; then
+        sed -i "/^### $Pengguna $Days $Pass/d" /etc/xray/ssh
+        rm /home/vps/public_html/ssh-$Pengguna.txt >/dev/null 2>&1
+        rm /etc/xray/sshx/${Pengguna}IP >/dev/null 2>&1
+        rm /etc/xray/sshx/${Pengguna}login >/dev/null 2>&1
+        if getent passwd $Pengguna > /dev/null 2>&1; then
+        userdel $Pengguna > /dev/null 2>&1
+        echo -e "User $Pengguna was removed."
+        else
+        echo -e "Failure: User $Pengguna Not Exist."
+        fi
+        TEXT="
 <code>◇━━━━━━━━━━━━━━◇</code>
 <b>  DELETE SSH OVPN</b>
 <code>◇━━━━━━━━━━━━━━◇</code>
@@ -684,14 +709,186 @@ TEXT="
 <code>◇━━━━━━━━━━━━━━◇</code>
 <i>Succes Delete This User...</i>
 "
-curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
-cd
-if [ ! -e /etc/tele ]; then
-echo -ne
+        curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        cd
+        if [ ! -e /etc/tele ]; then
+        echo -ne
+        else
+        echo "$TEXT" > /etc/notiftele
+        bash /etc/tele
+        fi
+    else
+        echo "Delete dibatalkan."
+    fi
+
+elif [[ $delete_mode == "2" ]]; then
+    # MULTIPLE USERS DELETE
+    clear
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│${NC}              ${WH}• DELETE MULTIPLE USERS •          │${NC}$COLOR1$NC"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    echo -e " "
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│ ${WH}Masukkan nomor user yang ingin didelete      $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}Contoh: 1,3,5 atau 1-5 atau 1,3-7,9         $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}ketik 'all' untuk delete semua user          $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}ketik [0] kembali kemenu                     $COLOR1   │"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    echo -e " "
+    echo "List Users:"
+    grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2-3 | nl -s ') '
+    echo ""
+    read -rp "Masukkan pilihan: " selection
+
+    if [[ $selection == "0" ]]; then
+        m-sshovpn
+    elif [[ $selection == "all" ]]; then
+        # DELETE ALL USERS
+        echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+        echo -e "$COLOR1│ ${WH}PERINGATAN: Akan mendelete SEMUA user!       $COLOR1    │"
+        echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+        read -rp "Yakin ingin delete SEMUA user? ketik 'DELETE ALL' untuk konfirmasi: " confirm_all
+        if [[ $confirm_all == "DELETE ALL" ]]; then
+            deleted_count=0
+            deleted_users=""
+            while IFS= read -r line; do
+                if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+                    user="${BASH_REMATCH[1]}"
+                    exp="${BASH_REMATCH[2]}"
+                    pass="${BASH_REMATCH[3]}"
+                    # Delete user
+                    sed -i "/^### $user $exp $pass/d" /etc/xray/ssh
+                    rm /home/vps/public_html/ssh-$user.txt >/dev/null 2>&1
+                    rm /etc/xray/sshx/${user}IP >/dev/null 2>&1
+                    rm /etc/xray/sshx/${user}login >/dev/null 2>&1
+                    if getent passwd $user > /dev/null 2>&1; then
+                        userdel $user > /dev/null 2>&1
+                    fi
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$deleted_users$user, "
+                fi
+            done < /etc/xray/ssh
+
+            deleted_users=${deleted_users%, }  # Remove trailing comma
+            echo "Berhasil delete $deleted_count users: $deleted_users"
+
+            # Send telegram notification
+            TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  BULK DELETE SSH USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>Bulk Delete Users Success...</i>
+"
+            curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        else
+            echo "Delete dibatalkan."
+        fi
+    else
+        # PARSE SELECTION AND DELETE SELECTED USERS
+        # Convert selection to array of numbers
+        selected_numbers=()
+        IFS=',' read -ra ADDR <<< "$selection"
+        for i in "${ADDR[@]}"; do
+            if [[ $i =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                # Range format (e.g., 1-5)
+                start=${BASH_REMATCH[1]}
+                end=${BASH_REMATCH[2]}
+                for ((j=start; j<=end; j++)); do
+                    if [[ $j -ge 1 && $j -le $NUMBER_OF_CLIENTS ]]; then
+                        selected_numbers+=($j)
+                    fi
+                done
+            elif [[ $i =~ ^[0-9]+$ ]]; then
+                # Single number
+                if [[ $i -ge 1 && $i -le $NUMBER_OF_CLIENTS ]]; then
+                    selected_numbers+=($i)
+                fi
+            fi
+        done
+
+        # Remove duplicates and sort
+        selected_numbers=($(printf '%s\n' "${selected_numbers[@]}" | sort -nu))
+
+        if [[ ${#selected_numbers[@]} -eq 0 ]]; then
+            echo "Tidak ada nomor yang valid dipilih."
+        else
+            # Show selected users for confirmation
+            echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+            echo -e "$COLOR1│ ${WH}User yang akan didelete:                     $COLOR1    │"
+            echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+            users_to_delete=""
+            for num in "${selected_numbers[@]}"; do
+                user=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2 | sed -n "${num}p")
+                exp=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 3 | sed -n "${num}p")
+                echo "$num) $user ($exp)"
+                users_to_delete="$users_to_delete$user, "
+            done
+            users_to_delete=${users_to_delete%, }  # Remove trailing comma
+
+            echo ""
+            read -rp "Yakin ingin delete ${#selected_numbers[@]} users ini? [y/n]: " confirm_multi
+            if [[ $confirm_multi =~ ^[Yy]$ ]]; then
+                deleted_count=0
+                deleted_users=""
+                # Delete in reverse order to maintain correct line numbers
+                for ((i=${#selected_numbers[@]}-1; i>=0; i--)); do
+                    num=${selected_numbers[i]}
+                    user=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 2 | sed -n "${num}p")
+                    exp=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 3 | sed -n "${num}p")
+                    pass=$(grep -E "^### " "/etc/xray/ssh" | cut -d ' ' -f 4 | sed -n "${num}p")
+
+                    # Delete user
+                    sed -i "/^### $user $exp $pass/d" /etc/xray/ssh
+                    rm /home/vps/public_html/ssh-$user.txt >/dev/null 2>&1
+                    rm /etc/xray/sshx/${user}IP >/dev/null 2>&1
+                    rm /etc/xray/sshx/${user}login >/dev/null 2>&1
+                    if getent passwd $user > /dev/null 2>&1; then
+                        userdel $user > /dev/null 2>&1
+                        echo "User $user was removed."
+                    fi
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$user, $deleted_users"
+                done
+
+                deleted_users=${deleted_users%, }  # Remove trailing comma
+                echo "Berhasil delete $deleted_count users: $deleted_users"
+
+                # Send telegram notification
+                TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  BULK DELETE SSH USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>Bulk Delete Users Success...</i>
+"
+                curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+                cd
+                if [ ! -e /etc/tele ]; then
+                echo -ne
+                else
+                echo "$TEXT" > /etc/notiftele
+                bash /etc/tele
+                fi
+            else
+                echo "Delete dibatalkan."
+            fi
+        fi
+    fi
 else
-echo "$TEXT" > /etc/notiftele
-bash /etc/tele
+    echo "Pilihan tidak valid."
+    sleep 1
+    hapus
 fi
+
 read -n 1 -s -r -p "Press any key to back on menu"
 m-sshovpn
 }
