@@ -56,9 +56,8 @@ until [[ $timer =~ ^[0-9]+$ ]]; do
 read -p "   Masa Aktif (Menit): " timer
 done
 
-# Set expired date untuk trial (0 hari karena menggunakan menit)
-hari=0
-expi=`date -d "$hari days" +"%Y-%m-%d"`
+# Set expired date untuk trial (hari ini karena menggunakan menit)
+expi=`date +"%Y-%m-%d"`
 if [ ! -e /etc/xray/sshx ]; then
 mkdir -p /etc/xray/sshx
 fi
@@ -76,7 +75,7 @@ sleep 1
 clear
 
 # TRIAL ACCOUNT - menggunakan menit
-useradd -e `date -d "1 days" +"%Y-%m-%d"` -s /bin/false -M $Login
+useradd -e `date +"%Y-%m-%d"` -s /bin/false -M $Login
 exp="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
 echo -e "$Pass\n$Pass\n"|passwd $Login &> /dev/null
 echo -e "### $Login $expi $Pass" >> /etc/xray/ssh
