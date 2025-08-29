@@ -97,6 +97,9 @@ rm-rf m-usernew-ssh
 rm-rf m-usernew-vmess
 rm-rf m-usernew-vless
 rm-rf m-usernew-tr
+rm-rf m-usernew-ssh-trial
+rm-rf m-usernew-vmess-trial
+rm-rf m-usernew-vless-trial
 
 fun_bar() {
     CMD[0]="$1"
