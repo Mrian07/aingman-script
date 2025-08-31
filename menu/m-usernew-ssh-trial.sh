@@ -80,10 +80,12 @@ exp="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
 echo -e "$Pass\n$Pass\n"|passwd $Login &> /dev/null
 echo -e "### $Login $expi $Pass" >> /etc/xray/ssh
 # Setup cron job untuk auto delete setelah timer menit
+# Hitung waktu exact kapan harus delete (sekarang + timer menit)
+future_time=$(date -d "+${timer} minutes" "+%M %H %d %m *")
 cat> /etc/cron.d/trialssh${Login} << EOF
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/$timer * * * * root /usr/bin/trial ssh $Login $Pass $expi
+$future_time root /usr/bin/trial "" trialssh $Login $timer && rm -f /etc/cron.d/trialssh${Login}
 EOF
 # TRIAL ACCOUNT
 cat > /home/vps/public_html/ssh-$Login.txt <<-END
@@ -262,6 +264,9 @@ echo -e "$COLOR1$NC${WH}Limit IP ${COLOR1}: ${WH}${iplim} User" | tee -a /etc/xr
 echo -e "$COLOR1$NC${WH}SSH : ${WH}$domen:80@$Login:$Pass" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 echo -e "$COLOR1$NC${WH}Masa Aktif ${COLOR1}: ${WH}$timer Menit" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 echo -e "$COLOR1$NC${WH}Expired On ${COLOR1}: ${WH}$exp"  | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
+auto_delete_time=$(date -d "+${timer} minutes" "+%Y-%m-%d %H:%M:%S")
+echo -e "$COLOR1$NC${WH}Auto Delete ${COLOR1}: ${WH}$auto_delete_time WIB" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
+echo -e "$COLOR1$NC${WH}Cron Job ${COLOR1}: ${WH}/etc/cron.d/trialssh${Login}" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 
 echo -e "$COLOR1 ◇━━━━ PORT ━━━━━◇ ${NC}" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 echo -e "$COLOR1$NC${WH}OpenSSH  ${COLOR1}: ${WH}22" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
