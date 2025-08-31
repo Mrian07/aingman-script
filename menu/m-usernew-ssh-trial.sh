@@ -79,14 +79,65 @@ useradd -e `date +"%Y-%m-%d"` -s /bin/false -M $Login
 exp="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
 echo -e "$Pass\n$Pass\n"|passwd $Login &> /dev/null
 echo -e "### $Login $expi $Pass" >> /etc/xray/ssh
-# Setup cron job untuk auto delete setelah timer menit
-# Hitung waktu exact kapan harus delete (sekarang + timer menit)
-future_time=$(date -d "+${timer} minutes" "+%M %H %d %m *")
-cat> /etc/cron.d/trialssh${Login} << EOF
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-$future_time root /usr/bin/trial "" trialssh $Login $timer && rm -f /etc/cron.d/trialssh${Login}
-EOF
+# Setup auto delete menggunakan AT Command (default)
+# Install at service jika belum ada
+if ! command -v at >/dev/null 2>&1; then
+    apt-get update >/dev/null 2>&1
+    apt-get install -y at >/dev/null 2>&1
+fi
+systemctl enable atd >/dev/null 2>&1
+systemctl start atd >/dev/null 2>&1
+
+# Buat script auto delete dengan force disconnect
+cat > /tmp/delete_trial_${Login}.sh << 'EOFSCRIPT'
+#!/bin/bash
+# Auto delete script untuk trial user: ${Login}
+LOGIN="${Login}"
+
+echo "Starting auto delete for user: $LOGIN"
+
+# Force kill SSH connections untuk mengatasi HTTP Custom yang masih konek
+echo "Killing SSH connections..."
+ps aux | grep "sshd.*$LOGIN" | grep -v grep | awk '{print $2}' | xargs -r kill -9 >/dev/null 2>&1
+pkill -f "sshd.*$LOGIN" >/dev/null 2>&1
+ps -u "$LOGIN" -o pid= 2>/dev/null | xargs -r kill -9 >/dev/null 2>&1
+
+# Kill WebSocket services untuk HTTP Custom
+pkill -f "ws-stunnel" >/dev/null 2>&1
+pkill -f "ws-dropbear" >/dev/null 2>&1
+pkill -f "ws-ovpn" >/dev/null 2>&1
+
+# Delete user dari sistem
+getent passwd $LOGIN >/dev/null 2>&1 && userdel -f $LOGIN >/dev/null 2>&1
+
+# Delete dari file SSH
+exp=$(grep -wE "^### $LOGIN" "/etc/xray/ssh" | cut -d ' ' -f 3 | sort | uniq)
+pass=$(grep -wE "^### $LOGIN" "/etc/xray/ssh" | cut -d ' ' -f 4 | sort | uniq)
+sed -i "/^### $LOGIN $exp $pass/d" /etc/xray/ssh >/dev/null 2>&1
+
+# Clean files
+rm /home/vps/public_html/ssh-$LOGIN.txt >/dev/null 2>&1
+rm /etc/xray/sshx/${LOGIN}IP >/dev/null 2>&1
+rm /etc/xray/sshx/${LOGIN}login >/dev/null 2>&1
+rm /etc/xray/sshx/akun/log-create-${LOGIN}.log >/dev/null 2>&1
+
+# Restart services untuk memastikan koneksi HTTP Custom terputus
+systemctl restart sshd >/dev/null 2>&1
+systemctl restart ws-stunnel >/dev/null 2>&1
+systemctl restart ws-dropbear >/dev/null 2>&1
+systemctl restart ws-ovpn >/dev/null 2>&1
+
+# Cleanup script
+rm /tmp/delete_trial_${LOGIN}.sh >/dev/null 2>&1
+
+echo "Auto delete completed for user: $LOGIN"
+EOFSCRIPT
+
+# Replace variables in script
+sed -i "s/\${Login}/$Login/g" /tmp/delete_trial_${Login}.sh
+chmod +x /tmp/delete_trial_${Login}.sh
+echo "/tmp/delete_trial_${Login}.sh" | at now + ${timer} minutes >/dev/null 2>&1
+delete_info="AT Command (${timer} menit dari sekarang)"
 # TRIAL ACCOUNT
 cat > /home/vps/public_html/ssh-$Login.txt <<-END
 _______________________________
@@ -266,7 +317,6 @@ echo -e "$COLOR1$NC${WH}Masa Aktif ${COLOR1}: ${WH}$timer Menit" | tee -a /etc/x
 echo -e "$COLOR1$NC${WH}Expired On ${COLOR1}: ${WH}$exp"  | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 auto_delete_time=$(date -d "+${timer} minutes" "+%Y-%m-%d %H:%M:%S")
 echo -e "$COLOR1$NC${WH}Auto Delete ${COLOR1}: ${WH}$auto_delete_time WIB" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
-echo -e "$COLOR1$NC${WH}Cron Job ${COLOR1}: ${WH}/etc/cron.d/trialssh${Login}" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 
 echo -e "$COLOR1 ◇━━━━ PORT ━━━━━◇ ${NC}" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
 echo -e "$COLOR1$NC${WH}OpenSSH  ${COLOR1}: ${WH}22" | tee -a /etc/xray/sshx/akun/log-create-${Login}.log
