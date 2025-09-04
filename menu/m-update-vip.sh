@@ -162,13 +162,18 @@ wget -q -O /usr/bin/trialssh "https://raw.githubusercontent.com/Mrian07/aingman-
 wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/autocpu.sh" && chmod +x /usr/bin/autocpu
 wget -q -O /usr/bin/bantwidth "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/bantwidth" && chmod +x /usr/bin/bantwidth
 wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwss/ws-stunnel" && chmod +x /usr/bin/autocpu
+# =============================================================================================== #
 wget -q -O /usr/bin/m-usernew-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh.sh" && chmod +x /usr/bin/m-usernew-ssh
 wget -q -O /usr/bin/m-usernew-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess.sh" && chmod +x /usr/bin/m-usernew-vmess
 wget -q -O /usr/bin/m-usernew-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless.sh" && chmod +x /usr/bin/m-usernew-vless
 wget -q -O /usr/bin/m-usernew-tr "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr.sh" && chmod +x /usr/bin/m-usernew-tr
+wget -q -O /usr/bin/m-usernew-noobz "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-noobz.sh" && chmod +x /usr/bin/m-usernew-noobz
+# =============================================================================================== #
 wget -q -O /usr/bin/m-usernew-ssh-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh-trial.sh" && chmod +x /usr/bin/m-usernew-ssh-trial
 wget -q -O /usr/bin/m-usernew-vmess-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess-trial.sh" && chmod +x /usr/bin/m-usernew-vmess-trial
 wget -q -O /usr/bin/m-usernew-vless-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless-trial.sh" && chmod +x /usr/bin/m-usernew-vless-trial
+wget -q -O /usr/bin/m-usernew-tr-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr-trial.sh" && chmod +x /usr/bin/m-usernew-tr-trial
+wget -q -O /usr/bin/m-usernew-noobz-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-noobz-trial.sh" && chmod +x /usr/bin/m-usernew-noobz-trial
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
@@ -203,9 +208,12 @@ chmod +x m-usernew-ssh
 chmod +x m-usernew-vmess
 chmod +x m-usernew-vless
 chmod +x m-usernew-tr
+chmod +x m-usernew-noobz
 chmod +x m-usernew-ssh-trial
 chmod +x m-usernew-vmess-trial
 chmod +x m-usernew-vless-trial
+chmod +x m-usernew-tr-trial
+chmod +x m-usernew-noobz-trial
 clear
 
 }
