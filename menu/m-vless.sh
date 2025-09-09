@@ -684,9 +684,10 @@ function del-vless() {
     echo -e "$COLOR1│ ${WH}Pilih mode delete:                           $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[1] Single User Delete                       $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[2] Multiple Users Delete                    $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}[3] Delete All Trial Users                   $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[0] Kembali ke menu                          $COLOR1    │"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    read -rp "Pilih mode [1-2]: " delete_mode
+    read -rp "Pilih mode [1-3]: " delete_mode
 
     if [[ $delete_mode == "0" ]]; then
         m-vless
@@ -918,6 +919,106 @@ function del-vless() {
                 fi
             fi
         fi
+
+    elif [[ $delete_mode == "3" ]]; then
+        # DELETE ALL TRIAL USERS
+        clear
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete All Trial Vless Users ⇲  ${NC} $COLOR1 $NC"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+
+        # Count trial users
+        trial_count=$(grep -E "^#vl trial-" "/etc/xray/config.json" | wc -l)
+
+        if [[ $trial_count -eq 0 ]]; then
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e " Tidak ada user trial vless yang ditemukan!"
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo ""
+            read -n 1 -s -r -p "Press any key to back on menu"
+            m-vless
+        fi
+
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " Ditemukan $trial_count user trial vless:"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo "List Trial Vless Users:"
+        grep -E "^#vl trial-" "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
+        echo ""
+
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " PERINGATAN: Akan mendelete SEMUA user trial vless!"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        read -rp "Yakin ingin delete semua user trial vless? ketik 'DELETE TRIAL' untuk konfirmasi: " confirm_trial
+
+        if [[ $confirm_trial == "DELETE TRIAL" ]]; then
+            deleted_count=0
+            deleted_users=""
+
+            # Get all trial users and delete them
+            while IFS= read -r line; do
+                if [[ $line =~ ^#vl\ (trial-.*)\ (.*)\ (.*)$ ]]; then
+                    user="${BASH_REMATCH[1]}"
+                    exp="${BASH_REMATCH[2]}"
+                    uuid="${BASH_REMATCH[3]}"
+
+                    # Delete user from VLESS
+                    if [ ! -e /etc/vless/akundelete ]; then
+                        echo "" >/etc/vless/akundelete
+                    fi
+                    echo "### $user $exp $uuid" >>/etc/vless/akundelete
+                    sed -i "/^#vl $user $exp/,/^},{/d" /etc/xray/config.json
+                    sed -i "/^#vlg $user $exp/,/^},{/d" /etc/xray/config.json
+
+                    # Clean up files
+                    rm /etc/vless/${user}IP >/dev/null 2>&1
+                    rm /home/vps/public_html/vless-$user.txt >/dev/null 2>&1
+                    rm /etc/vless/${user}login >/dev/null 2>&1
+                    rm /etc/vless/akun/log-create-${user}.log >/dev/null 2>&1
+
+                    # Cancel any pending cron jobs for this trial user
+                    rm /etc/cron.d/trialvless${user} >/dev/null 2>&1
+
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$deleted_users$user, "
+
+                    echo "User trial vless $user berhasil dihapus."
+                fi
+            done < <(grep -E "^#vl trial-" "/etc/xray/config.json")
+
+            # Restart Xray service
+            systemctl restart xray >/dev/null 2>&1
+
+            deleted_users=${deleted_users%, }  # Remove trailing comma
+            echo ""
+            echo "Berhasil menghapus $deleted_count user trial vless: $deleted_users"
+
+            # Send telegram notification
+            TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  DELETE ALL TRIAL VLESS USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count trial vless users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>All Trial Vless Users Deleted Successfully...</i>
+"
+            curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+            cd
+            if [ ! -e /etc/tele ]; then
+                echo -ne
+            else
+                echo "$TEXT" >/etc/notiftele
+                bash /etc/tele
+            fi
+        else
+            echo "Delete trial vless users dibatalkan."
+        fi
+
     else
         echo "Pilihan tidak valid."
         sleep 1

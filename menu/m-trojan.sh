@@ -616,38 +616,62 @@ clear
 echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete Trojan Account ⇲    ${NC} $COLOR1 $NC"
 echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo " Select the existing client you want to remove"
-echo " ketik [0] kembali kemenu"
+echo ""
 echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo "     No  User   Expired"
-grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
-until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-if [[ ${CLIENT_NUMBER} == '1' ]]; then
-read -rp "Select one client [1]: " CLIENT_NUMBER
-else
-read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
-if [[ ${CLIENT_NUMBER} == '0' ]]; then
-m-trojan
-fi
-fi
-done
-user=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-exp=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-uuid=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 4 | sed -n "${CLIENT_NUMBER}"p)
-if [ ! -e /etc/trojan/akundelete ]; then
-echo "" > /etc/trojan/akundelete
-fi
-clear
-echo "### $user $exp $uuid" >> /etc/trojan/akundelete
-sed -i "/^#tr $user $exp/,/^},{/d" /etc/xray/config.json
-sed -i "/^#trg $user $exp/,/^},{/d" /etc/xray/config.json
-rm  /etc/trojan/${user}IP >/dev/null 2>&1
-clear
-rm /home/vps/public_html/trojan-$user.txt >/dev/null 2>&1
-rm /etc/trojan/${user}login >/dev/null 2>&1
-systemctl restart xray > /dev/null 2>&1
-clear
-TEXT="
+echo -e "$COLOR1│ ${WH}Pilih mode delete:                           $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[1] Single User Delete                       $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[2] Multiple Users Delete                    $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[3] Delete All Trial Users                   $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[0] Kembali ke menu                          $COLOR1    │"
+echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+read -rp "Pilih mode [1-3]: " delete_mode
+
+if [[ $delete_mode == "0" ]]; then
+    m-trojan
+elif [[ $delete_mode == "1" ]]; then
+    # SINGLE USER DELETE
+    clear
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete Single Trojan Account ⇲  ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo " Select the existing client you want to remove"
+    echo " ketik [0] kembali kemenu"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "     No  User   Expired"
+    grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
+    until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
+        if [[ ${CLIENT_NUMBER} == '1' ]]; then
+            read -rp "Select one client [1]: " CLIENT_NUMBER
+        else
+            read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+            if [[ ${CLIENT_NUMBER} == '0' ]]; then
+                m-trojan
+            fi
+        fi
+    done
+    user=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
+    exp=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
+    uuid=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 4 | sed -n "${CLIENT_NUMBER}"p)
+
+    # Konfirmasi delete
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " Konfirmasi Delete User: $user"
+    echo -e " Expired: $exp"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    read -rp "Yakin ingin delete user ini? [y/n]: " confirm
+    if [[ $confirm =~ ^[Yy]$ ]]; then
+        if [ ! -e /etc/trojan/akundelete ]; then
+            echo "" > /etc/trojan/akundelete
+        fi
+        echo "### $user $exp $uuid" >> /etc/trojan/akundelete
+        sed -i "/^#tr $user $exp/,/^},{/d" /etc/xray/config.json
+        sed -i "/^#trg $user $exp/,/^},{/d" /etc/xray/config.json
+        rm  /etc/trojan/${user}IP >/dev/null 2>&1
+        rm /home/vps/public_html/trojan-$user.txt >/dev/null 2>&1
+        rm /etc/trojan/${user}login >/dev/null 2>&1
+        systemctl restart xray > /dev/null 2>&1
+
+        TEXT="
 <code>◇━━━━━━━━━━━━━━◇</code>
 <b>  XRAY TROJAN DELETE</b>
 <code>◇━━━━━━━━━━━━━━◇</code>
@@ -658,19 +682,286 @@ TEXT="
 <code>◇━━━━━━━━━━━━━━◇</code>
 <i>Succes Delete this Username...</i>
 "
-curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
-cd
-if [ ! -e /etc/tele ]; then
-echo -ne
+        curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        cd
+        if [ ! -e /etc/tele ]; then
+            echo -ne
+        else
+            echo "$TEXT" > /etc/notiftele
+            bash /etc/tele
+        fi
+        echo "User $user was removed."
+    else
+        echo "Delete dibatalkan."
+    fi
+
+elif [[ $delete_mode == "2" ]]; then
+    # MULTIPLE USERS DELETE
+    clear
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete Multiple Trojan Users ⇲  ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " Masukkan nomor user yang ingin didelete"
+    echo -e " Contoh: 1,3,5 atau 1-5 atau 1,3-7,9"
+    echo -e " ketik 'all' untuk delete semua user"
+    echo -e " ketik [0] kembali kemenu"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo "List Users:"
+    grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
+    echo ""
+    read -rp "Masukkan pilihan: " selection
+
+    if [[ $selection == "0" ]]; then
+        m-trojan
+    elif [[ $selection == "all" ]]; then
+        # DELETE ALL USERS
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " PERINGATAN: Akan mendelete SEMUA user!"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        read -rp "Yakin ingin delete SEMUA user? ketik 'DELETE ALL' untuk konfirmasi: " confirm_all
+        if [[ $confirm_all == "DELETE ALL" ]]; then
+            deleted_count=0
+            deleted_users=""
+            while IFS= read -r line; do
+                if [[ $line =~ ^#tr\ (.*)\ (.*)\ (.*)$ ]]; then
+                    user="${BASH_REMATCH[1]}"
+                    exp="${BASH_REMATCH[2]}"
+                    uuid="${BASH_REMATCH[3]}"
+                    # Delete user
+                    if [ ! -e /etc/trojan/akundelete ]; then
+                        echo "" > /etc/trojan/akundelete
+                    fi
+                    echo "### $user $exp $uuid" >> /etc/trojan/akundelete
+                    sed -i "/^#tr $user $exp/,/^},{/d" /etc/xray/config.json
+                    sed -i "/^#trg $user $exp/,/^},{/d" /etc/xray/config.json
+                    rm  /etc/trojan/${user}IP >/dev/null 2>&1
+                    rm /home/vps/public_html/trojan-$user.txt >/dev/null 2>&1
+                    rm /etc/trojan/${user}login >/dev/null 2>&1
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$deleted_users$user, "
+                fi
+            done < <(grep -E "^#tr " "/etc/xray/config.json")
+
+            systemctl restart xray > /dev/null 2>&1
+            deleted_users=${deleted_users%, }
+            echo "Berhasil delete $deleted_count users: $deleted_users"
+
+            # Send telegram notification
+            TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  BULK DELETE TROJAN USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>Bulk Delete Users Success...</i>
+"
+            curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        else
+            echo "Delete dibatalkan."
+        fi
+    else
+        # PARSE SELECTION AND DELETE SELECTED USERS
+        selected_numbers=()
+        IFS=',' read -ra ADDR <<< "$selection"
+        for i in "${ADDR[@]}"; do
+            if [[ $i =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                start=${BASH_REMATCH[1]}
+                end=${BASH_REMATCH[2]}
+                for ((j=start; j<=end; j++)); do
+                    if [[ $j -ge 1 && $j -le $NUMBER_OF_CLIENTS ]]; then
+                        selected_numbers+=($j)
+                    fi
+                done
+            elif [[ $i =~ ^[0-9]+$ ]]; then
+                if [[ $i -ge 1 && $i -le $NUMBER_OF_CLIENTS ]]; then
+                    selected_numbers+=($i)
+                fi
+            fi
+        done
+
+        selected_numbers=($(printf '%s\n' "${selected_numbers[@]}" | sort -nu))
+
+        if [[ ${#selected_numbers[@]} -eq 0 ]]; then
+            echo "Tidak ada nomor yang valid dipilih."
+        else
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e " User yang akan didelete:"
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            users_to_delete=""
+            for num in "${selected_numbers[@]}"; do
+                user=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${num}p")
+                exp=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${num}p")
+                echo "$num) $user ($exp)"
+                users_to_delete="$users_to_delete$user, "
+            done
+            users_to_delete=${users_to_delete%, }
+
+            echo ""
+            read -rp "Yakin ingin delete ${#selected_numbers[@]} users ini? [y/n]: " confirm_multi
+            if [[ $confirm_multi =~ ^[Yy]$ ]]; then
+                deleted_count=0
+                deleted_users=""
+                for ((i=${#selected_numbers[@]}-1; i>=0; i--)); do
+                    num=${selected_numbers[i]}
+                    user=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${num}p")
+                    exp=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${num}p")
+                    uuid=$(grep -E "^#tr " "/etc/xray/config.json" | cut -d ' ' -f 4 | sed -n "${num}p")
+
+                    if [ ! -e /etc/trojan/akundelete ]; then
+                        echo "" > /etc/trojan/akundelete
+                    fi
+                    echo "### $user $exp $uuid" >> /etc/trojan/akundelete
+                    sed -i "/^#tr $user $exp/,/^},{/d" /etc/xray/config.json
+                    sed -i "/^#trg $user $exp/,/^},{/d" /etc/xray/config.json
+                    rm  /etc/trojan/${user}IP >/dev/null 2>&1
+                    rm /home/vps/public_html/trojan-$user.txt >/dev/null 2>&1
+                    rm /etc/trojan/${user}login >/dev/null 2>&1
+                    echo "User $user was removed."
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$user, $deleted_users"
+                done
+
+                systemctl restart xray > /dev/null 2>&1
+                deleted_users=${deleted_users%, }
+                echo "Berhasil delete $deleted_count users: $deleted_users"
+
+                # Send telegram notification
+                TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  BULK DELETE TROJAN USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>Bulk Delete Users Success...</i>
+"
+                curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+                cd
+                if [ ! -e /etc/tele ]; then
+                    echo -ne
+                else
+                    echo "$TEXT" > /etc/notiftele
+                    bash /etc/tele
+                fi
+            else
+                echo "Delete dibatalkan."
+            fi
+        fi
+    fi
+
+elif [[ $delete_mode == "3" ]]; then
+    # DELETE ALL TRIAL USERS
+    clear
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete All Trial Trojan Users ⇲  ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Count trial users
+    trial_count=$(grep -E "^#tr trial-" "/etc/xray/config.json" | wc -l)
+
+    if [[ $trial_count -eq 0 ]]; then
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " Tidak ada user trial trojan yang ditemukan!"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        read -n 1 -s -r -p "Press any key to back on menu"
+        m-trojan
+    fi
+
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " Ditemukan $trial_count user trial trojan:"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo "List Trial Trojan Users:"
+    grep -E "^#tr trial-" "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
+    echo ""
+
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " PERINGATAN: Akan mendelete SEMUA user trial trojan!"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    read -rp "Yakin ingin delete semua user trial trojan? ketik 'DELETE TRIAL' untuk konfirmasi: " confirm_trial
+
+    if [[ $confirm_trial == "DELETE TRIAL" ]]; then
+        deleted_count=0
+        deleted_users=""
+
+        # Get all trial users and delete them
+        while IFS= read -r line; do
+            if [[ $line =~ ^#tr\ (trial-.*)\ (.*)\ (.*)$ ]]; then
+                user="${BASH_REMATCH[1]}"
+                exp="${BASH_REMATCH[2]}"
+                uuid="${BASH_REMATCH[3]}"
+
+                # Delete user from TROJAN
+                if [ ! -e /etc/trojan/akundelete ]; then
+                    echo "" > /etc/trojan/akundelete
+                fi
+                echo "### $user $exp $uuid" >> /etc/trojan/akundelete
+                sed -i "/^#tr $user $exp/,/^},{/d" /etc/xray/config.json
+                sed -i "/^#trg $user $exp/,/^},{/d" /etc/xray/config.json
+
+                # Clean up files
+                rm  /etc/trojan/${user}IP >/dev/null 2>&1
+                rm /home/vps/public_html/trojan-$user.txt >/dev/null 2>&1
+                rm /etc/trojan/${user}login >/dev/null 2>&1
+                rm /etc/trojan/akun/log-create-${user}.log >/dev/null 2>&1
+
+                # Cancel any pending cron jobs for this trial user
+                rm /etc/cron.d/trialtrojan${user} >/dev/null 2>&1
+
+                deleted_count=$((deleted_count + 1))
+                deleted_users="$deleted_users$user, "
+
+                echo "User trial trojan $user berhasil dihapus."
+            fi
+        done < <(grep -E "^#tr trial-" "/etc/xray/config.json")
+
+        # Restart Xray service
+        systemctl restart xray > /dev/null 2>&1
+
+        deleted_users=${deleted_users%, }  # Remove trailing comma
+        echo ""
+        echo "Berhasil menghapus $deleted_count user trial trojan: $deleted_users"
+
+        # Send telegram notification
+        TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  DELETE ALL TRIAL TROJAN USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count trial trojan users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>All Trial Trojan Users Deleted Successfully...</i>
+"
+        curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        cd
+        if [ ! -e /etc/tele ]; then
+            echo -ne
+        else
+            echo "$TEXT" > /etc/notiftele
+            bash /etc/tele
+        fi
+    else
+        echo "Delete trial trojan users dibatalkan."
+    fi
+
 else
-echo "$TEXT" > /etc/notiftele
-bash /etc/tele
+    echo "Pilihan tidak valid."
+    sleep 1
+    del-tr
 fi
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo " Trojan Account Deleted Successfully"
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo " Client Name : $user"
-echo " Expired On  : $exp"
+
 echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to back on menu"

@@ -958,9 +958,10 @@ function del-vmess() {
     echo -e "$COLOR1│ ${WH}Pilih mode delete:                           $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[1] Single User Delete                       $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[2] Multiple Users Delete                    $COLOR1    │"
+    echo -e "$COLOR1│ ${WH}[3] Delete All Trial Users                   $COLOR1    │"
     echo -e "$COLOR1│ ${WH}[0] Kembali ke menu                          $COLOR1    │"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    read -rp "Pilih mode [1-2]: " delete_mode
+    read -rp "Pilih mode [1-3]: " delete_mode
 
     if [[ $delete_mode == "0" ]]; then
         m-vmess
@@ -1192,6 +1193,106 @@ function del-vmess() {
                 fi
             fi
         fi
+
+    elif [[ $delete_mode == "3" ]]; then
+        # DELETE ALL TRIAL USERS
+        clear
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "$COLOR1 ${NC}${COLBG1}    ${WH}⇱ Delete All Trial Vmess Users ⇲  ${NC} $COLOR1 $NC"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+
+        # Count trial users
+        trial_count=$(grep -E "^#vmg trial-" "/etc/xray/config.json" | wc -l)
+
+        if [[ $trial_count -eq 0 ]]; then
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e " Tidak ada user trial vmess yang ditemukan!"
+            echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo ""
+            read -n 1 -s -r -p "Press any key to back on menu"
+            m-vmess
+        fi
+
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " Ditemukan $trial_count user trial vmess:"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo "List Trial Vmess Users:"
+        grep -E "^#vmg trial-" "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
+        echo ""
+
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e " PERINGATAN: Akan mendelete SEMUA user trial vmess!"
+        echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        read -rp "Yakin ingin delete semua user trial vmess? ketik 'DELETE TRIAL' untuk konfirmasi: " confirm_trial
+
+        if [[ $confirm_trial == "DELETE TRIAL" ]]; then
+            deleted_count=0
+            deleted_users=""
+
+            # Get all trial users and delete them
+            while IFS= read -r line; do
+                if [[ $line =~ ^#vmg\ (trial-.*)\ (.*)\ (.*)$ ]]; then
+                    user="${BASH_REMATCH[1]}"
+                    exp="${BASH_REMATCH[2]}"
+                    uuid="${BASH_REMATCH[3]}"
+
+                    # Delete user from VMESS
+                    if [ ! -e /etc/vmess/akundelete ]; then
+                        echo "" >/etc/vmess/akundelete
+                    fi
+                    echo "### $user $exp $uuid" >>/etc/vmess/akundelete
+                    sed -i "/^#vmg $user $exp/,/^},{/d" /etc/xray/config.json
+                    sed -i "/^#vm $user $exp/,/^},{/d" /etc/xray/config.json
+
+                    # Clean up files
+                    rm /home/vps/public_html/vmess-$user.txt >/dev/null 2>&1
+                    rm /etc/vmess/${user}IP >/dev/null 2>&1
+                    rm /etc/vmess/${user}login >/dev/null 2>&1
+
+                    # Cancel any pending AT jobs for this trial user
+                    at -l | grep delete_trial_${user} | awk '{print $1}' | xargs -r atrm >/dev/null 2>&1
+                    rm /tmp/delete_trial_${user}.sh >/dev/null 2>&1
+
+                    deleted_count=$((deleted_count + 1))
+                    deleted_users="$deleted_users$user, "
+
+                    echo "User trial vmess $user berhasil dihapus."
+                fi
+            done < <(grep -E "^#vmg trial-" "/etc/xray/config.json")
+
+            # Restart Xray service
+            systemctl restart xray >/dev/null 2>&1
+
+            deleted_users=${deleted_users%, }  # Remove trailing comma
+            echo ""
+            echo "Berhasil menghapus $deleted_count user trial vmess: $deleted_users"
+
+            # Send telegram notification
+            TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  DELETE ALL TRIAL VMESS USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count trial vmess users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>All Trial Vmess Users Deleted Successfully...</i>
+"
+            curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+            cd
+            if [ ! -e /etc/tele ]; then
+                echo -ne
+            else
+                echo "$TEXT" >/etc/notiftele
+                bash /etc/tele
+            fi
+        else
+            echo "Delete trial vmess users dibatalkan."
+        fi
+
     else
         echo "Pilihan tidak valid."
         sleep 1

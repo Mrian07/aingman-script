@@ -649,9 +649,10 @@ echo -e "$COLOR1╭════════════════════�
 echo -e "$COLOR1│ ${WH}Pilih mode delete:                           $COLOR1    │"
 echo -e "$COLOR1│ ${WH}[1] Single User Delete                       $COLOR1    │"
 echo -e "$COLOR1│ ${WH}[2] Multiple Users Delete                    $COLOR1    │"
+echo -e "$COLOR1│ ${WH}[3] Delete All Trial Users                   $COLOR1    │"
 echo -e "$COLOR1│ ${WH}[0] Kembali ke menu                          $COLOR1    │"
 echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
-read -rp "Pilih mode [1-2]: " delete_mode
+read -rp "Pilih mode [1-3]: " delete_mode
 
 if [[ $delete_mode == "0" ]]; then
     m-sshovpn
@@ -883,6 +884,117 @@ elif [[ $delete_mode == "2" ]]; then
             fi
         fi
     fi
+
+elif [[ $delete_mode == "3" ]]; then
+    # DELETE ALL TRIAL USERS
+    clear
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│${NC}              ${WH}• DELETE ALL TRIAL USERS •         │${NC}$COLOR1$NC"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    echo -e " "
+
+    # Count trial users
+    trial_count=$(grep -E "^### trial-" "/etc/xray/ssh" | wc -l)
+
+    if [[ $trial_count -eq 0 ]]; then
+        echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+        echo -e "$COLOR1│                                                 │"
+        echo -e "$COLOR1│${WH} Tidak ada user trial yang ditemukan!        $COLOR1   │"
+        echo -e "$COLOR1│                                                 │"
+        echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+        echo ""
+        read -n 1 -s -r -p "Press any key to back on menu"
+        m-sshovpn
+    fi
+
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│ ${WH}Ditemukan $trial_count user trial:               $COLOR1    │"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    echo -e " "
+    echo "List Trial Users:"
+    grep -E "^### trial-" "/etc/xray/ssh" | cut -d ' ' -f 2-3 | nl -s ') '
+    echo ""
+
+    echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+    echo -e "$COLOR1│ ${WH}PERINGATAN: Akan mendelete SEMUA user trial!    $COLOR1    │"
+    echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+    read -rp "Yakin ingin delete semua user trial? ketik 'DELETE TRIAL' untuk konfirmasi: " confirm_trial
+
+    if [[ $confirm_trial == "DELETE TRIAL" ]]; then
+        deleted_count=0
+        deleted_users=""
+
+        # Get all trial users and delete them
+        while IFS= read -r line; do
+            if [[ $line =~ ^###\ (trial-.*)\ (.*)\ (.*)$ ]]; then
+                user="${BASH_REMATCH[1]}"
+                exp="${BASH_REMATCH[2]}"
+                pass="${BASH_REMATCH[3]}"
+
+                # Force kill any active sessions for trial user
+                ps aux | grep "sshd.*$user" | grep -v grep | awk '{print $2}' | xargs -r kill -9 >/dev/null 2>&1
+                pkill -f "sshd.*$user" >/dev/null 2>&1
+                ps -u "$user" -o pid= 2>/dev/null | xargs -r kill -9 >/dev/null 2>&1
+
+                # Delete user from system
+                if getent passwd $user > /dev/null 2>&1; then
+                    userdel -f $user > /dev/null 2>&1
+                fi
+
+                # Delete from SSH file
+                sed -i "/^### $user $exp $pass/d" /etc/xray/ssh
+
+                # Clean up files
+                rm /home/vps/public_html/ssh-$user.txt >/dev/null 2>&1
+                rm /etc/xray/sshx/${user}IP >/dev/null 2>&1
+                rm /etc/xray/sshx/${user}login >/dev/null 2>&1
+                rm /etc/xray/sshx/akun/log-create-${user}.log >/dev/null 2>&1
+
+                # Cancel any pending AT jobs for this trial user
+                at -l | grep delete_trial_${user} | awk '{print $1}' | xargs -r atrm >/dev/null 2>&1
+                rm /tmp/delete_trial_${user}.sh >/dev/null 2>&1
+
+                deleted_count=$((deleted_count + 1))
+                deleted_users="$deleted_users$user, "
+
+                echo "User trial $user berhasil dihapus."
+            fi
+        done < <(grep -E "^### trial-" "/etc/xray/ssh")
+
+        # Restart SSH service to ensure all connections are terminated
+        systemctl restart sshd >/dev/null 2>&1
+        systemctl restart ws-stunnel >/dev/null 2>&1
+        systemctl restart ws-dropbear >/dev/null 2>&1
+        systemctl restart ws-ovpn >/dev/null 2>&1
+
+        deleted_users=${deleted_users%, }  # Remove trailing comma
+        echo ""
+        echo "Berhasil menghapus $deleted_count user trial: $deleted_users"
+
+        # Send telegram notification
+        TEXT="
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>  DELETE ALL TRIAL SSH USERS</b>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<b>DOMAIN   :</b> <code>${domain} </code>
+<b>ISP      :</b> <code>$ISP $CITY </code>
+<b>DELETED  :</b> <code>$deleted_count trial users</code>
+<b>USERS    :</b> <code>$deleted_users</code>
+<code>◇━━━━━━━━━━━━━━◇</code>
+<i>All Trial Users Deleted Successfully...</i>
+"
+        curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+        cd
+        if [ ! -e /etc/tele ]; then
+        echo -ne
+        else
+        echo "$TEXT" > /etc/notiftele
+        bash /etc/tele
+        fi
+    else
+        echo "Delete trial users dibatalkan."
+    fi
+
 else
     echo "Pilihan tidak valid."
     sleep 1
