@@ -105,12 +105,55 @@ noobzvpns --add-user $user $pass --expired-user $user $exp_days
 expi=`date -d "$exp_days days" +"%Y-%m-%d"`
 echo -e "### $user $pass $expi" >> /etc/xray/noob
 
-# Setup cron job untuk auto delete setelah timer menit
-cat> /etc/cron.d/trialnoobz${user} << END
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/$timer * * * * root /usr/bin/trial noobz $user $pass $expi
-END
+# Setup auto delete menggunakan AT Command (seperti SSH dan Trojan trial)
+# Install at service jika belum ada
+if ! command -v at >/dev/null 2>&1; then
+    apt-get update >/dev/null 2>&1
+    apt-get install -y at >/dev/null 2>&1
+fi
+systemctl enable atd >/dev/null 2>&1
+systemctl start atd >/dev/null 2>&1
+
+# Buat script auto delete dengan force disconnect
+cat > /tmp/delete_trial_noobz_${user}.sh << 'EOFSCRIPT'
+#!/bin/bash
+# Auto delete script untuk trial noobz user: ${user}
+USER="${user}"
+PASS="${pass}"
+EXP="${expi}"
+
+echo "Starting auto delete for noobz user: $USER"
+
+# Force kill noobzvpns processes untuk user
+pkill -f "noobzvpns.*$USER" >/dev/null 2>&1
+pkill -f "noobz.*$USER" >/dev/null 2>&1
+
+# Delete user dari noobzvpns system
+noobzvpns --remove-user $USER >/dev/null 2>&1
+
+# Delete dari file noob
+sed -i "/^### $USER $PASS $EXP/d" /etc/xray/noob >/dev/null 2>&1
+
+# Clean files
+rm /home/vps/public_html/noobzvpns-$USER.txt >/dev/null 2>&1
+rm /etc/sf/limit/noobs/ip/$USER >/dev/null 2>&1
+rm /etc/xray/noobz/akun/log-create-${USER}.log >/dev/null 2>&1
+
+# Force restart noobzvpns service
+systemctl restart noobzvpns >/dev/null 2>&1
+
+# Cleanup script
+rm /tmp/delete_trial_noobz_${USER}.sh >/dev/null 2>&1
+
+echo "Auto delete completed for noobz user: $USER"
+EOFSCRIPT
+
+# Replace variables in script
+sed -i "s/\${user}/$user/g" /tmp/delete_trial_noobz_${user}.sh
+sed -i "s/\${pass}/$pass/g" /tmp/delete_trial_noobz_${user}.sh
+sed -i "s/\${expi}/$expi/g" /tmp/delete_trial_noobz_${user}.sh
+chmod +x /tmp/delete_trial_noobz_${user}.sh
+echo "/tmp/delete_trial_noobz_${user}.sh" | at now + ${timer} minutes >/dev/null 2>&1
 
 clear
 cat > /home/vps/public_html/noobzvpns-$user.txt <<-END

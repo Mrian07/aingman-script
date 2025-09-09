@@ -70,12 +70,60 @@ trojanlink="trojan://${uuid}@${domain}:443?path=%2Ftrojan-ws&security=tls&host=$
 trojan1="trojan://${uuid}@${domain}:443?mode=gun%26security=tls%26type=grpc%26serviceName=trojan-grpc%26sni=${domain}#${user}"
 trojan2="trojan://${uuid}@${domain}:443?path=%2Ftrojan-ws%26security=tls%26host=${domain}%26type=ws%26sni=${domain}#${user}"
 trojan3="trojan://${uuid}@${domain}:80?security=none%2type=ws%2path=%2Ftrojan-ntls%2host=${domain}#${user}"
-# Setup cron job untuk auto delete setelah timer menit
-cat> /etc/cron.d/trialtrojan${user} << END
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/$timer * * * * root /usr/bin/trial trojan $user $uuid $exp
-END
+# Setup auto delete menggunakan AT Command (seperti SSH trial)
+# Install at service jika belum ada
+if ! command -v at >/dev/null 2>&1; then
+    apt-get update >/dev/null 2>&1
+    apt-get install -y at >/dev/null 2>&1
+fi
+systemctl enable atd >/dev/null 2>&1
+systemctl start atd >/dev/null 2>&1
+
+# Buat script auto delete dengan force disconnect
+cat > /tmp/delete_trial_trojan_${user}.sh << 'EOFSCRIPT'
+#!/bin/bash
+# Auto delete script untuk trial trojan user: ${user}
+USER="${user}"
+UUID="${uuid}"
+EXP="${exp}"
+
+echo "Starting auto delete for trojan user: $USER"
+
+# Force kill processes untuk trojan connections
+pkill -f "trojan.*$USER" >/dev/null 2>&1
+pkill -f "xray.*trojan.*$USER" >/dev/null 2>&1
+
+# Delete user dari config trojan
+sed -i "/^#tr $USER $EXP/,/^},{/d" /etc/xray/config.json >/dev/null 2>&1
+sed -i "/^#trg $USER $EXP/,/^},{/d" /etc/xray/config.json >/dev/null 2>&1
+
+# Clean files
+rm /home/vps/public_html/trojan-$USER.txt >/dev/null 2>&1
+rm /etc/trojan/${USER} >/dev/null 2>&1
+rm /etc/trojan/${USER}IP >/dev/null 2>&1
+rm /etc/trojan/akun/log-create-${USER}.log >/dev/null 2>&1
+
+# Add to delete log
+if [ ! -e /etc/trojan/akundelete ]; then
+    echo "" > /etc/trojan/akundelete
+fi
+echo "### $USER $EXP $UUID" >> /etc/trojan/akundelete
+
+# Restart xray service
+systemctl restart xray >/dev/null 2>&1
+
+# Cleanup script
+rm /tmp/delete_trial_trojan_${USER}.sh >/dev/null 2>&1
+
+echo "Auto delete completed for trojan user: $USER"
+EOFSCRIPT
+
+# Replace variables in script
+sed -i "s/\${user}/$user/g" /tmp/delete_trial_trojan_${user}.sh
+sed -i "s/\${uuid}/$uuid/g" /tmp/delete_trial_trojan_${user}.sh
+sed -i "s/\${exp}/$exp/g" /tmp/delete_trial_trojan_${user}.sh
+chmod +x /tmp/delete_trial_trojan_${user}.sh
+echo "/tmp/delete_trial_trojan_${user}.sh" | at now + ${timer} minutes >/dev/null 2>&1
 cat > /home/vps/public_html/trojan-$user.txt <<-END
 _______________________________
 Format Trojan WS (CDN) - TRIAL
