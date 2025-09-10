@@ -223,7 +223,7 @@ echo -e "DOMAIN : $( cat /etc/xray/domain )" | tee -a /etc/xray/noobz/akun/log-c
 echo -e "USERNAME: $user" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
 echo -e "PASSWORD: $pass" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
 echo -e "IP LIMIT: $ip" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
-echo -e "EXP DAYS: $expi ( $exp Days )" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
+echo -e "EXP TIME: $expi ( $exp Days )" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
 echo -e "tcp_std port:  8080" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
 echo -e "tcp_ssl port: 8443" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
 echo -e "◇━━━━━━━━━━━━━━━━━◇" | tee -a /etc/xray/noobz/akun/log-create-${user}.log
