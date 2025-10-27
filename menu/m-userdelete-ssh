@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Color definitions
+NC="\e[0m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+
+# Get username from argument or stdin
+if [ -n "$1" ]; then
+    # Username provided as argument
+    Pengguna="$1"
+else
+    # Read from stdin (for piped input)
+    read -r Pengguna
+fi
+
+# Trim whitespace
+Pengguna=$(echo "$Pengguna" | xargs)
+
+# Check if username is empty
+if [ -z "$Pengguna" ]; then
+    echo -e "${RED}Error: Username tidak boleh kosong${NC}"
+    exit 1
+fi
+
+# Check if user exists
+if ! getent passwd "$Pengguna" > /dev/null 2>&1; then
+    echo -e "${RED}Error: User $Pengguna tidak ditemukan${NC}"
+    exit 1
+fi
+
+# Get user info before deletion
+exp=$(grep -wE "^### $Pengguna" "/etc/xray/ssh" | cut -d ' ' -f 3 | sort | uniq)
+pass=$(grep -wE "^### $Pengguna" "/etc/xray/ssh" | cut -d ' ' -f 4 | sort | uniq)
+
+# Delete system user
+userdel -f "$Pengguna" > /dev/null 2>&1
+
+# Remove from SSH user list
+sed -i "/^### $Pengguna /d" /etc/xray/ssh
+
+# Remove user files
+rm -rf /home/vps/public_html/ssh-${Pengguna}.txt
+rm -rf /etc/xray/sshx/${Pengguna}IP
+rm -rf /etc/xray/sshx/${Pengguna}login
+rm -rf /etc/xray/sshx/akun/log-create-${Pengguna}.log
+rm -rf /etc/cron.d/trialssh${Pengguna}
+
+# Restart SSH service
+systemctl restart sshd > /dev/null 2>&1
+
+# Success message
+echo -e "${GREEN}Success: User $Pengguna telah dihapus${NC}"
+echo -e "Username: $Pengguna"
+if [ -n "$exp" ]; then
+    echo -e "Expired: $exp"
+fi
+
+exit 0
+

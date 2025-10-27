@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Color definitions
+NC="\e[0m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+
+# Get username from argument or stdin
+if [ -n "$1" ]; then
+    # Username provided as argument
+    user="$1"
+else
+    # Read from stdin (for piped input)
+    read -r user
+fi
+
+# Trim whitespace
+user=$(echo "$user" | xargs)
+
+# Check if username is empty
+if [ -z "$user" ]; then
+    echo -e "${RED}Error: Username tidak boleh kosong${NC}"
+    exit 1
+fi
+
+# Check if user exists in vmess config
+if ! grep -qE "^#vmg $user " "/etc/xray/config.json"; then
+    echo -e "${RED}Error: User vmess $user tidak ditemukan${NC}"
+    exit 1
+fi
+
+# Get user info before deletion
+exp=$(grep -E "^#vmg $user " "/etc/xray/config.json" | cut -d ' ' -f 3 | head -n1)
+uuid=$(grep -E "^#vmg $user " "/etc/xray/config.json" | cut -d ' ' -f 4 | head -n1)
+
+# Create akundelete directory if not exists
+if [ ! -e /etc/vmess/akundelete ]; then
+    mkdir -p /etc/vmess
+    echo "" > /etc/vmess/akundelete
+fi
+
+# Log deleted account
+echo "### $user $exp $uuid" >> /etc/vmess/akundelete
+
+# Remove from xray config (both #vmg and #vm entries)
+sed -i "/^#vmg $user $exp/,/^},{/d" /etc/xray/config.json
+sed -i "/^#vm $user $exp/,/^},{/d" /etc/xray/config.json
+
+# Remove user files
+rm -f /home/vps/public_html/vmess-${user}.txt >/dev/null 2>&1
+rm -f /etc/vmess/${user}IP >/dev/null 2>&1
+rm -f /etc/vmess/${user}login >/dev/null 2>&1
+rm -f /etc/vmess/akun/log-create-${user}.log >/dev/null 2>&1
+
+# If it's a trial user, remove AT job and temp script
+if [[ $user == trial-* ]]; then
+    at -l | grep delete_trial_${user} | awk '{print $1}' | xargs -r atrm >/dev/null 2>&1
+    rm -f /tmp/delete_trial_${user}.sh >/dev/null 2>&1
+fi
+
+# Restart xray service
+systemctl restart xray >/dev/null 2>&1
+
+# Success message
+echo -e "${GREEN}Success: User vmess $user telah dihapus${NC}"
+echo -e "Username: $user"
+if [ -n "$exp" ]; then
+    echo -e "Expired: $exp"
+fi
+if [ -n "$uuid" ]; then
+    echo -e "UUID: $uuid"
+fi
+
+exit 0
+

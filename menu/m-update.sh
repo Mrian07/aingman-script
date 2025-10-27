@@ -100,6 +100,9 @@ rm-rf m-usernew-tr
 rm-rf m-usernew-ssh-trial
 rm-rf m-usernew-vmess-trial
 rm-rf m-usernew-vless-trial
+rm-rf m-userdelete-ssh
+rm-rf m-userdelete-vmess
+rm-rf m-userdelete-vless
 
 fun_bar() {
     CMD[0]="$1"
@@ -170,7 +173,9 @@ wget -q -O /usr/bin/m-usernew-ssh-trial "https://raw.githubusercontent.com/Mrian
 wget -q -O /usr/bin/m-usernew-vmess-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess-trial.sh" && chmod +x /usr/bin/m-usernew-vmess-trial
 wget -q -O /usr/bin/m-usernew-vless-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless-trial.sh" && chmod +x /usr/bin/m-usernew-vless-trial
 wget -q -O /usr/bin/m-usernew-tr-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr-trial.sh" && chmod +x /usr/bin/m-usernew-tr-trial
-
+wget -q -O /usr/bin/m-userdelete-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-ssh.sh" && chmod +x /usr/bin/m-userdelete-ssh
+wget -q -O /usr/bin/m-userdelete-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vmess.sh" && chmod +x /usr/bin/m-userdelete-vmess
+wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vless.sh" && chmod +x /usr/bin/m-userdelete-vless
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
@@ -209,6 +214,9 @@ chmod +x m-usernew-ssh-trial
 chmod +x m-usernew-vmess-trial
 chmod +x m-usernew-vless-trial
 chmod +x m-usernew-tr-trial
+chmod +x m-userdelete-ssh
+chmod +x m-userdelete-vmess
+chmod +x m-userdelete-vless
 clear
 
 }
