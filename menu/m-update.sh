@@ -97,6 +97,9 @@ rm-rf m-usernew-ssh
 rm-rf m-usernew-vmess
 rm-rf m-usernew-vless
 rm-rf m-usernew-tr
+rm-rf m-usernew-ssh-trial
+rm-rf m-usernew-vmess-trial
+rm-rf m-usernew-vless-trial
 
 fun_bar() {
     CMD[0]="$1"
@@ -125,7 +128,7 @@ fun_bar() {
     tput cnorm
 }
 res1() {
-    
+
 wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu.sh" && chmod +x /usr/bin/menu
 wget -q -O /usr/bin/m-trgo "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-trgo.sh" && chmod +x /usr/bin/m-trgo
 wget -q -O /usr/bin/restore "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/restore.sh" && chmod +x /usr/bin/restore
@@ -163,6 +166,11 @@ wget -q -O /usr/bin/m-usernew-ssh "https://raw.githubusercontent.com/Mrian07/ain
 wget -q -O /usr/bin/m-usernew-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess.sh" && chmod +x /usr/bin/m-usernew-vmess
 wget -q -O /usr/bin/m-usernew-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless.sh" && chmod +x /usr/bin/m-usernew-vless
 wget -q -O /usr/bin/m-usernew-tr "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr.sh" && chmod +x /usr/bin/m-usernew-tr
+wget -q -O /usr/bin/m-usernew-ssh-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh-trial.sh" && chmod +x /usr/bin/m-usernew-ssh-trial
+wget -q -O /usr/bin/m-usernew-vmess-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess-trial.sh" && chmod +x /usr/bin/m-usernew-vmess-trial
+wget -q -O /usr/bin/m-usernew-vless-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless-trial.sh" && chmod +x /usr/bin/m-usernew-vless-trial
+wget -q -O /usr/bin/m-usernew-tr-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr-trial.sh" && chmod +x /usr/bin/m-usernew-tr-trial
+
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
@@ -197,6 +205,10 @@ chmod +x m-usernew-ssh
 chmod +x m-usernew-vmess
 chmod +x m-usernew-vless
 chmod +x m-usernew-tr
+chmod +x m-usernew-ssh-trial
+chmod +x m-usernew-vmess-trial
+chmod +x m-usernew-vless-trial
+chmod +x m-usernew-tr-trial
 clear
 
 }
