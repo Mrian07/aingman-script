@@ -165,7 +165,7 @@ function domain() {
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo -e " "
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.serverkit.pw          ${NC}"
+        echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.paketvpn.vip          ${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo -e "${BIBlue} kata (xxxx) nanti akan diganti dengan nama subdommain${NC}"
         until [[ $domain2 =~ ^[1-5]+$ ]]; do
@@ -175,7 +175,7 @@ function domain() {
     if [[ $domain2 == "1" ]]; then
         clear
         echo -e "${BIBlue}╭═════════════════════════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.serverkit.pw                     ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip                     ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu         ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰═════════════════════════════════════════════════════════════╯${NC}"
         echo " "
@@ -205,7 +205,7 @@ function domain() {
     elif [[ $domain2 == "2" ]]; then
         clear
         echo -e "${BIBlue}╭═════════════════════════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m  xxxx.serverkit.pw                    ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketvpn.vip                    ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu         ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰═════════════════════════════════════════════════════════════╯${NC}"
         echo " "
@@ -235,7 +235,7 @@ function domain() {
     elif [[ $domain2 == "3" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.serverkit.pw      ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip      ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37m xxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
@@ -265,7 +265,7 @@ function domain() {
     elif [[ $domain2 == "4" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.serverkit.pw        ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip        ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
@@ -295,7 +295,7 @@ function domain() {
     elif [[ $domain2 == "5" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m  xxxx.serverkit.pw      ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketvpn.vip      ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
