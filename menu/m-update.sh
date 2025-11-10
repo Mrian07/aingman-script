@@ -176,6 +176,8 @@ wget -q -O /usr/bin/m-usernew-tr-trial "https://raw.githubusercontent.com/Mrian0
 wget -q -O /usr/bin/m-userdelete-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-ssh.sh" && chmod +x /usr/bin/m-userdelete-ssh
 wget -q -O /usr/bin/m-userdelete-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vmess.sh" && chmod +x /usr/bin/m-userdelete-vmess
 wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vless.sh" && chmod +x /usr/bin/m-userdelete-vless
+wget -q -O /usr/bin/hapus-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-trial.sh" && chmod +x /usr/bin/hapus-trial
+chmod +x hapus-trial
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
