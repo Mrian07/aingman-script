@@ -120,7 +120,7 @@ fun_bar() {
     tput cnorm
 }
 res1() {
-    
+
 wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu.sh" && chmod +x /usr/bin/menu
 wget -q -O /usr/bin/m-trgo "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-trgo.sh" && chmod +x /usr/bin/m-trgo
 wget -q -O /usr/bin/restore "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/restore.sh" && chmod +x /usr/bin/restore
@@ -154,7 +154,10 @@ wget -q -O /usr/bin/trialssh "https://raw.githubusercontent.com/Mrian07/aingman-
 wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/autocpu.sh" && chmod +x /usr/bin/autocpu
 wget -q -O /usr/bin/bantwidth "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/bantwidth" && chmod +x /usr/bin/bantwidth
 wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshws/ws-stunnel" && chmod +x /usr/bin/autocpu
+wget -q -O /usr/bin/ex "https://raw.githubusercontent.com/Mrian07/aingman-script/main/ex" && chmod +x /usr/bin/ex
+
 chmod +x menu
+chmod +x ex
 chmod +x m-vmess
 chmod +x m-vless
 chmod +x m-trojan
@@ -184,6 +187,7 @@ chmod +x trialssh
 chmod +x autocpu
 chmod +x bantwidth
 chmod +x ws-stunnel
+
 clear
 
 }
