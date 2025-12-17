@@ -37,6 +37,10 @@ function delete_all_expired_users() {
     trojan_users=""
 
     today=$(date +%Y-%m-%d)
+    current_user=$(whoami)
+
+    # Dapatkan daftar user yang sedang login via SSH
+    logged_users=$(who | awk '{print $1}' | sort -u)
 
     echo -e "${WH}[1/4] Menghapus expired SSH/OVPN users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -47,6 +51,12 @@ function delete_all_expired_users() {
                 user="${BASH_REMATCH[1]}"
                 exp="${BASH_REMATCH[2]}"
                 pass="${BASH_REMATCH[3]}"
+
+                # Skip jika user sedang login atau user penting
+                if echo "$logged_users" | grep -q "^${user}$" || [[ "$user" == "root" ]] || [[ "$user" == "$current_user" ]]; then
+                    echo "  ⚠ SSH User $user sedang login, dilewati"
+                    continue
+                fi
 
                 exp_date=$(date -d "$exp" +%Y-%m-%d 2>/dev/null)
                 if [[ "$exp_date" < "$today" ]]; then
