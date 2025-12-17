@@ -52,6 +52,11 @@ function delete_all_expired_users() {
                 exp="${BASH_REMATCH[2]}"
                 pass="${BASH_REMATCH[3]}"
 
+                # Hanya proses user dengan prefix premium_ atau trial-
+                if [[ ! "$user" =~ ^(premium_|trial-) ]]; then
+                    continue
+                fi
+
                 # Skip jika user sedang login atau user penting
                 if echo "$logged_users" | grep -q "^${user}$" || [[ "$user" == "root" ]] || [[ "$user" == "$current_user" ]]; then
                     echo "  ⚠ SSH User $user sedang login, dilewati"
@@ -107,6 +112,11 @@ function delete_all_expired_users() {
                 exp="${BASH_REMATCH[2]}"
                 uuid="${BASH_REMATCH[3]}"
 
+                # Hanya proses user dengan prefix premium_ atau trial-
+                if [[ ! "$user" =~ ^(premium_|trial-) ]]; then
+                    continue
+                fi
+
                 exp_date=$(date -d "$exp" +%Y-%m-%d 2>/dev/null)
                 if [[ "$exp_date" < "$today" ]]; then
                     if [ ! -e /etc/vless/akundelete ]; then
@@ -149,6 +159,11 @@ function delete_all_expired_users() {
                 exp="${BASH_REMATCH[2]}"
                 uuid="${BASH_REMATCH[3]}"
 
+                # Hanya proses user dengan prefix premium_ atau trial-
+                if [[ ! "$user" =~ ^(premium_|trial-) ]]; then
+                    continue
+                fi
+
                 exp_date=$(date -d "$exp" +%Y-%m-%d 2>/dev/null)
                 if [[ "$exp_date" < "$today" ]]; then
                     if [ ! -e /etc/vmess/akundelete ]; then
@@ -188,6 +203,11 @@ function delete_all_expired_users() {
                 user="${BASH_REMATCH[1]}"
                 exp="${BASH_REMATCH[2]}"
                 uuid="${BASH_REMATCH[3]}"
+
+                # Hanya proses user dengan prefix premium_ atau trial-
+                if [[ ! "$user" =~ ^(premium_|trial-) ]]; then
+                    continue
+                fi
 
                 exp_date=$(date -d "$exp" +%Y-%m-%d 2>/dev/null)
                 if [[ "$exp_date" < "$today" ]]; then
