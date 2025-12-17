@@ -177,7 +177,34 @@ wget -q -O /usr/bin/m-userdelete-ssh "https://raw.githubusercontent.com/Mrian07/
 wget -q -O /usr/bin/m-userdelete-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vmess.sh" && chmod +x /usr/bin/m-userdelete-vmess
 wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vless.sh" && chmod +x /usr/bin/m-userdelete-vless
 wget -q -O /usr/bin/hapus-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-trial.sh" && chmod +x /usr/bin/hapus-trial
+wget -q -O /usr/bin/hapus-expired "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-expired.sh" && chmod +x /usr/bin/hapus-expired
+
+# Setup cronjob untuk hapus trial otomatis setiap hari
+CRON_FILE="/etc/cron.d/hapus-trial-auto"
+cat > "$CRON_FILE" << 'EOF'
+# Cronjob untuk menghapus semua trial users setiap hari
+# Dijalankan setiap hari jam 00:00 (tengah malam)
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 0 * * * root /bin/bash /usr/bin/hapus-trial >/dev/null 2>&1
+EOF
+chmod 644 "$CRON_FILE"
+
+# Setup cronjob untuk hapus expired users setiap 2 hari sekali
+CRON_FILE_EXPIRED="/etc/cron.d/hapus-expired-auto"
+cat > "$CRON_FILE_EXPIRED" << 'EOF'
+# Cronjob untuk menghapus semua expired users setiap 2 hari sekali
+# Dijalankan setiap 2 hari jam 02:00 (dini hari)
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 2 */2 * * root /bin/bash /usr/bin/hapus-expired >/dev/null 2>&1
+EOF
+chmod 644 "$CRON_FILE_EXPIRED"
+
 chmod +x hapus-trial
+chmod +x hapus-expired
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
@@ -219,6 +246,8 @@ chmod +x m-usernew-tr-trial
 chmod +x m-userdelete-ssh
 chmod +x m-userdelete-vmess
 chmod +x m-userdelete-vless
+chmod +x hapus-trial
+chmod +x hapus-expired
 clear
 
 }
