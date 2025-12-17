@@ -179,15 +179,15 @@ wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian0
 wget -q -O /usr/bin/hapus-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-trial.sh" && chmod +x /usr/bin/hapus-trial
 wget -q -O /usr/bin/hapus-expired "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-expired.sh" && chmod +x /usr/bin/hapus-expired
 
-# Setup cronjob untuk hapus trial otomatis setiap hari
+# Setup cronjob untuk hapus trial otomatis setiap 1 jam
 CRON_FILE="/etc/cron.d/hapus-trial-auto"
 cat > "$CRON_FILE" << 'EOF'
-# Cronjob untuk menghapus semua trial users setiap hari
-# Dijalankan setiap hari jam 00:00 (tengah malam)
+# Cronjob untuk menghapus semua trial users setiap 1 jam
+# Dijalankan setiap jam pada menit ke-0 (00:00, 01:00, 02:00, dst)
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-0 0 * * * root /bin/bash /usr/bin/hapus-trial >/dev/null 2>&1
+0 * * * * root /bin/bash /usr/bin/hapus-trial >/dev/null 2>&1
 EOF
 chmod 644 "$CRON_FILE"
 
