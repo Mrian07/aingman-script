@@ -94,7 +94,7 @@ function domain() {
         tput cnorm
     }
     res1() {
-        wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/paketvpn.sh && chmod +x paketvpn.sh && ./paketvpn.sh
+        wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/rmbl.sh && chmod +x rmbl.sh && ./rmbl.sh
         clear
     }
     res2() {
@@ -165,7 +165,7 @@ function domain() {
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo -e " "
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.paketvpn.vip          ${NC}"
+        echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.paketssh.site          ${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo -e "${BIBlue} kata (xxxx) nanti akan diganti dengan nama subdommain${NC}"
         until [[ $domain2 =~ ^[1-5]+$ ]]; do
@@ -175,7 +175,7 @@ function domain() {
     if [[ $domain2 == "1" ]]; then
         clear
         echo -e "${BIBlue}╭═════════════════════════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip                     ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketssh.site                     ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu         ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰═════════════════════════════════════════════════════════════╯${NC}"
         echo " "
@@ -205,7 +205,7 @@ function domain() {
     elif [[ $domain2 == "2" ]]; then
         clear
         echo -e "${BIBlue}╭═════════════════════════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketvpn.vip                    ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketssh.site                    ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu         ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰═════════════════════════════════════════════════════════════╯${NC}"
         echo " "
@@ -235,7 +235,7 @@ function domain() {
     elif [[ $domain2 == "3" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip      ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketssh.site      ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37m xxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
@@ -265,7 +265,7 @@ function domain() {
     elif [[ $domain2 == "4" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m xxxx.paketvpn.vip        ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m xxxx.paketssh.site        ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
@@ -295,7 +295,7 @@ function domain() {
     elif [[ $domain2 == "5" ]]; then
         clear
         echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketvpn.vip      ${BIBlue}│${NC}"
+        echo -e "${BIBlue}│  \033[1;37m  xxxx.paketssh.site      ${BIBlue}│${NC}"
         echo -e "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
         echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
         echo " "
@@ -441,7 +441,7 @@ function Casper3() {
     echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
     echo -e "${BIBlue}│ ${BGCOLOR}  PROCESS INSTALLED SSH & OVVPN         ${NC}${BIBlue} │${NC}"
     echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
-    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/ssh-vpn-vip.sh && chmod +x ssh-vpn-vip.sh && ./ssh-vpn-vip.sh
+    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
     clear
 
     echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
@@ -453,7 +453,7 @@ function Casper3() {
     echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
     echo -e "${BIBlue}│ ${BGCOLOR}      PROCESS INSTALLED WEBSOCKET SSH   ${NC}${BIBlue} │${NC}"
     echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
-    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwsss/insshws.sh && chmod +x insshws.sh && ./insshws.sh
+    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
     clear
 
     echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
@@ -471,7 +471,7 @@ function Casper3() {
     echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
     echo -e "${BIBlue}│ ${BGCOLOR}          DOWNLOAD EXTRA MENU  ${NC}${BIBlue} │${NC}"
     echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
-    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-update-vip.sh && chmod +x m-update-vip.sh && ./m-update-vip.sh
+    wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-update.sh && chmod +x m-update.sh && ./m-update.sh
     clear
 
     #echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
@@ -585,7 +585,7 @@ curl -s ipinfo.io/city?token=75082b4831f909 >>/etc/xray/city
 curl -s ipinfo.io/org?token=75082b4831f909 | cut -d " " -f 2-10 >>/etc/xray/isp
 rm /root/setup.sh >/dev/null 2>&1
 rm /root/slhost.sh >/dev/null 2>&1
-rm /root/ssh-vpn-vip.sh >/dev/null 2>&1
+rm /root/ssh-vpn.sh >/dev/null 2>&1
 rm /root/ins-xray.sh >/dev/null 2>&1
 rm /root/insshws.sh >/dev/null 2>&1
 rm /root/set-br.sh >/dev/null 2>&1

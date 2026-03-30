@@ -7,7 +7,7 @@ cd /etc/
 wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/dobot.zip
 unzip dobot.zip
 cd dobot
-pip3 install -r /etc/dobot/requirements.txt
+pip3 install --break-system-packages -r /etc/dobot/requirements.txt
 echo -e ""
 read -e -p "[*] Input your Nama Store : " nama
 read -e -p "[*] Input your Bot Token : " bottoken

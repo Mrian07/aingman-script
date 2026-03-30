@@ -82,10 +82,10 @@ chmod +x /root/.acme.sh/acme.sh
 
 # nginx renew ssl
 echo -n '#!/bin/bash
-/etc/init.d/nginx stop
+systemctl stop nginx
 "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" &> /root/renew_ssl.log
-/etc/init.d/nginx start
-/etc/init.d/nginx status
+systemctl start nginx
+systemctl status nginx
 ' > /usr/local/bin/ssl_renew.sh
 chmod +x /usr/local/bin/ssl_renew.sh
 if ! grep -q 'ssl_renew.sh' /var/spool/cron/crontabs/root;then (crontab -l;echo "15 03 */3 * * /usr/local/bin/ssl_renew.sh") | crontab;fi

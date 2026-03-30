@@ -21,7 +21,7 @@ clear
 # clear
 wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/bot/kyt.zip
 unzip kyt.zip
-pip3 install -r kyt/requirements.txt
+pip3 install --break-system-packages -r kyt/requirements.txt
 clear
 cd /usr/bin/kyt/bot
 chmod +x *
@@ -209,7 +209,7 @@ clear
 wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/bot/kyt.zip
 unzip kyt.zip
 cd kyt
-pip3 install -r kyt/requirements.txt
+pip3 install --break-system-packages -r kyt/requirements.txt
 clear
 cd /usr/bin/kyt/bot
 chmod +x *
