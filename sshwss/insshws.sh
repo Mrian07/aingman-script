@@ -4,7 +4,7 @@
 # Link Hosting Kalian
 SFVPN="https://raw.githubusercontent.com/Mrian07/aingman-script/main"
 
-wget -O /usr/local/bin/ws-dropbear https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwss/ws-dropbear
+wget -O /usr/local/bin/ws-dropbear https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/sshwss/ws-dropbear
 chmod +x /usr/local/bin/ws-dropbear
 
 # Installing Service
@@ -32,7 +32,7 @@ systemctl enable ws-dropbear.service
 systemctl start ws-dropbear.service
 systemctl restart ws-dropbear.service
 
-#wget -O /usr/local/bin/ws-ovpn https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwss/ws-ovpn.py
+#wget -O /usr/local/bin/ws-ovpn https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/sshwss/ws-ovpn.py
 #chmod +x /usr/local/bin/ws-ovpn
 
 # Installing Service
@@ -59,7 +59,7 @@ systemctl restart ws-dropbear.service
 #systemctl enable ws-ovpn
 #systemctl restart ws-ovpn
 
-wget -O /usr/local/bin/ws-stunnel https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwss/ws-stunnel
+wget -O /usr/local/bin/ws-stunnel https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/sshwss/ws-stunnel
 chmod +x /usr/local/bin/ws-stunnel
 
 # Installing Service

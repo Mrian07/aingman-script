@@ -1,4 +1,4 @@
-REPO="https://raw.githubusercontent.com/Mrian07/aingman-script/main/"
+REPO="https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/"
 wget -q -O /etc/systemd/system/limitvmess.service "${REPO}bin/limitvmess.service" && chmod +x limitvmess.service >/dev/null 2>&1
 wget -q -O /etc/systemd/system/limitvless.service "${REPO}bin/limitvless.service" && chmod +x limitvless.service >/dev/null 2>&1
 wget -q -O /etc/systemd/system/limittrojan.service "${REPO}bin/limittrojan.service" && chmod +x limittrojan.service >/dev/null 2>&1

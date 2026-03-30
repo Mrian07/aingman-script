@@ -2,17 +2,17 @@
 
 apt install rclone
 printf "q\n" | rclone config
-wget -O /root/.config/rclone/rclone.conf "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/rclone.conf"
+wget -O /root/.config/rclone/rclone.conf "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/install/rclone.conf"
 git clone  https://github.com/casper9/wondershaper.git
 cd wondershaper
 make install
 cd
 rm -rf wondershaper
 cd /usr/bin
-wget -O backup "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/backup.sh"
-wget -O restore "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/restore.sh"
-wget -O cleaner "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/cleaner.sh"
-wget -O xp "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/xp.sh"
+wget -O backup "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/menu/backup.sh"
+wget -O restore "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/menu/restore.sh"
+wget -O cleaner "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/install/cleaner.sh"
+wget -O xp "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/install/xp.sh"
 chmod +x /usr/bin/backup
 chmod +x /usr/bin/restore
 chmod +x /usr/bin/cleaner
@@ -51,7 +51,7 @@ service cron restart > /dev/null 2>&1
 
 # > Pasang Limit
 
-#wget "https://raw.githubusercontent.com/Mrian07/aingman-script/main/bin/limit.sh" >/dev/null 2>&1
+#wget "https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/bin/limit.sh" >/dev/null 2>&1
 
 #chmod +x limit.sh && bash limit.sh >/dev/null 2>&1
     

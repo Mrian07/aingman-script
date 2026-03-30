@@ -319,7 +319,7 @@ function add_subdomain() {
         fi
 
         # Unduh dan jalankan skrip rmbl.sh
-        wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/subdomain.sh -O /tmp/subdomain.sh
+        wget https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/install/subdomain.sh -O /tmp/subdomain.sh
         chmod +x /tmp/subdomain.sh
 
         # Jalankan skrip rmbl.sh dengan animasi
@@ -516,7 +516,7 @@ case $opt in
 04 | 4) clear ; m-trojan ;;
 05 | 5) clear ; m-noobz ;;
 06 | 6) clear ; m-trgo ;;
-07 | 7) clear ; wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/ex.sh && chmod +x ex.sh && ./ex.sh ;;
+07 | 7) clear ; wget https://raw.githubusercontent.com/Mrian07/aingman-script/24.0/ex.sh && chmod +x ex.sh && ./ex.sh ;;
 08 | 8) clear ; running ;;
 09 | 9) clear ; restartservice ;;
 10 | 10) clear ; m-system ;;
