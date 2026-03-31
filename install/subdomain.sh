@@ -1,8 +1,8 @@
 #!/bin/bash
-DOMAIN=paketssh.site
+DOMAIN=paketssh.pw
 sub=$(cat /root/subdomainadd)
-dns=${sub}.paketssh.site
-dns2=*.${sub}.paketssh.site
+dns=${sub}.paketssh.pw
+dns2=*.${sub}.paketssh.pw
 CF_ID=ahmadardhiansyah2020@gmail.com
 CF_KEY=2ddb551a8182951c00608df6f5f2d03b6b54b
 set -euo pipefail

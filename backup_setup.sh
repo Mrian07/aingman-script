@@ -375,7 +375,7 @@ echo -e "${BIBlue}│ \033[1;37m    Pilih Sub-Domain           ${BIBlue}│${NC}
 echo -e "${BIBlue}╰══════════════════════════════════════════╯${NC}"
 echo -e " "
 echo -e "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.paketssh.site          ${NC}"
+echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.paketssh.pw          ${NC}"
 echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.vvpnstore.my.id          ${NC}"
 echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.aivpn.my.id          ${NC}"
 echo -e "${BIBlue}│  [ 1 ]  \033[1;37mDomain xxxx.aivpn.biz.id          ${NC}"
@@ -389,7 +389,7 @@ fi
 if [[ $domain2 == "1" ]]; then
 clear
 echo -e  "${BIBlue}╭══════════════════════════════════════════╮${NC}"
-echo -e  "${BIBlue}│  \033[1;37m xxxx.paketssh.site        ${BIBlue}│${NC}"
+echo -e  "${BIBlue}│  \033[1;37m xxxx.paketssh.pw        ${BIBlue}│${NC}"
 echo -e  "${BIBlue}│    \033[1;37mxxxx jadi subdomain nama kamu               ${BIBlue}│${NC}"
 echo -e  "${BIBlue}╰══════════════════════════════════════════╯${NC}"
 echo " "
