@@ -114,7 +114,7 @@ check_dependencies() {
         python3 -V >/dev/null 2>&1
         if [[ "$?" -eq "0" ]]; then
             python3_patch=$(which python3)
-            ln -s $python3_patch /usr/bin/python >/dev/null 2>&1
+            ln -s $python3_patch /usr/bin/python3 >/dev/null 2>&1
         else
             if [ -n "$if_debian" ]; then
                 echo -e "${Font_Green}Installing python${Font_Suffix}"
@@ -126,7 +126,7 @@ check_dependencies() {
                     $InstallMethod update >/dev/null 2>&1
                     $InstallMethod install python3 -y >/dev/null 2>&1
                     python3_patch=$(which python3)
-                    ln -s $python3_patch /usr/bin/python
+                    ln -s $python3_patch /usr/bin/python3
                 else
                     $InstallMethod update >/dev/null 2>&1
                     $InstallMethod install python -y >/dev/null 2>&1

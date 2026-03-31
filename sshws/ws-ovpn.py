@@ -1,21 +1,34 @@
-#!/usr/bin/python
-import socket, threading, thread, select, signal, sys, time, getopt
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# WebSocket Proxy for OpenVPN
+# Compatible with Python 3.x (Ubuntu 24.04)
+# ==========================================
 
-# Listen
+import socket
+import threading
+import select
+import signal
+import sys
+import time
+import getopt
+
+# Listen Configuration
 LISTENING_ADDR = '0.0.0.0'
 if sys.argv[1:]:
-  LISTENING_PORT = sys.argv[1]
+    LISTENING_PORT = int(sys.argv[1])
 else:
-  LISTENING_PORT = 2099  
-#Pass
+    LISTENING_PORT = 2099
+
+# Password (empty = no password required)
 PASS = ''
 
-# CONST
+# Constants
 BUFLEN = 4096 * 4
 TIMEOUT = 60
 DEFAULT_HOST = '127.0.0.1:1194'
-RESPONSE = 'HTTP/1.1 101 <u><font color="#00ff00">Switching Protocol By AimanVpnExpress</font></u>(Openvpn)\r\nContent-Length: 104857600000\r\n\r\n'
-#RESPONSE = 'HTTP/1.1 200 Websocket_openvpn\r\nContent-length: 0\r\nHTTP/1.1 200 Connection established\r\n\r\n'
+RESPONSE = b'HTTP/1.1 101 <u><font color="#00ff00">Switching Protocol By PAKETSSH.COM</font></u>(OpenVPN)\r\nContent-Length: 104857600000\r\n\r\n'
+
 
 class Server(threading.Thread):
     def __init__(self, host, port):
@@ -53,7 +66,7 @@ class Server(threading.Thread):
 
     def printLog(self, log):
         self.logLock.acquire()
-        print log
+        print(log)
         self.logLock.release()
 
     def addConn(self, conn):
@@ -89,7 +102,7 @@ class ConnectionHandler(threading.Thread):
         self.clientClosed = False
         self.targetClosed = True
         self.client = socClient
-        self.client_buffer = ''
+        self.client_buffer = b''
         self.server = server
         self.log = 'Connection: ' + str(addr)
 
@@ -128,41 +141,47 @@ class ConnectionHandler(threading.Thread):
 
             if hostPort != '':
                 passwd = self.findHeader(self.client_buffer, 'X-Pass')
-				
+                
                 if len(PASS) != 0 and passwd == PASS:
                     self.method_CONNECT(hostPort)
                 elif len(PASS) != 0 and passwd != PASS:
-                    self.client.send('HTTP/1.1 400 WrongPass!\r\n\r\n')
+                    self.client.send(b'HTTP/1.1 400 WrongPass!\r\n\r\n')
                 elif hostPort.startswith('127.0.0.1') or hostPort.startswith('localhost'):
                     self.method_CONNECT(hostPort)
                 else:
-                    self.client.send('HTTP/1.1 403 Forbidden!\r\n\r\n')
+                    self.client.send(b'HTTP/1.1 403 Forbidden!\r\n\r\n')
             else:
-                print '- No X-Real-Host!'
-                self.client.send('HTTP/1.1 400 NoXRealHost!\r\n\r\n')
+                print('- No X-Real-Host!')
+                self.client.send(b'HTTP/1.1 400 NoXRealHost!\r\n\r\n')
 
         except Exception as e:
-            self.log += ' - error: ' + e.strerror
+            self.log += ' - error: ' + str(e)
             self.server.printLog(self.log)
-	    pass
         finally:
             self.close()
             self.server.removeConn(self)
 
     def findHeader(self, head, header):
-        aux = head.find(header + ': ')
+        try:
+            # Convert bytes to string for header parsing
+            if isinstance(head, bytes):
+                head = head.decode('utf-8', errors='ignore')
+            
+            aux = head.find(header + ': ')
 
-        if aux == -1:
+            if aux == -1:
+                return ''
+
+            aux = head.find(':', aux)
+            head = head[aux+2:]
+            aux = head.find('\r\n')
+
+            if aux == -1:
+                return ''
+
+            return head[:aux]
+        except:
             return ''
-
-        aux = head.find(':', aux)
-        head = head[aux+2:]
-        aux = head.find('\r\n')
-
-        if aux == -1:
-            return ''
-
-        return head[:aux];
 
     def connect_target(self, host):
         i = host.find(':')
@@ -170,10 +189,7 @@ class ConnectionHandler(threading.Thread):
             port = int(host[i+1:])
             host = host[:i]
         else:
-            if self.method=='CONNECT':
-                port = 443
-            else:
-                port = sys.argv[1]
+            port = 1194  # Default OpenVPN port
 
         (soc_family, soc_type, proto, _, address) = socket.getaddrinfo(host, port)[0]
 
@@ -186,7 +202,7 @@ class ConnectionHandler(threading.Thread):
 
         self.connect_target(path)
         self.client.sendall(RESPONSE)
-        self.client_buffer = ''
+        self.client_buffer = b''
 
         self.server.printLog(self.log)
         self.doCONNECT()
@@ -202,20 +218,20 @@ class ConnectionHandler(threading.Thread):
                 error = True
             if recv:
                 for in_ in recv:
-		    try:
+                    try:
                         data = in_.recv(BUFLEN)
                         if data:
-			    if in_ is self.target:
-				self.client.send(data)
+                            if in_ is self.target:
+                                self.client.send(data)
                             else:
                                 while data:
                                     byte = self.target.send(data)
                                     data = data[byte:]
 
                             count = 0
-			else:
-			    break
-		    except:
+                        else:
+                            break
+                    except:
                         error = True
                         break
             if count == TIMEOUT:
@@ -225,16 +241,18 @@ class ConnectionHandler(threading.Thread):
 
 
 def print_usage():
-    print 'Usage: proxy.py -p <port>'
-    print '       proxy.py -b <bindAddr> -p <port>'
-    print '       proxy.py -b 0.0.0.0 -p 80'
+    print('Usage: ws-ovpn.py <port>')
+    print('       ws-ovpn.py -p <port>')
+    print('       ws-ovpn.py -b <bindAddr> -p <port>')
+    print('       ws-ovpn.py -b 0.0.0.0 -p 2099')
+
 
 def parse_args(argv):
     global LISTENING_ADDR
     global LISTENING_PORT
     
     try:
-        opts, args = getopt.getopt(argv,"hb:p:",["bind=","port="])
+        opts, args = getopt.getopt(argv, "hb:p:", ["bind=", "port="])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
@@ -249,20 +267,26 @@ def parse_args(argv):
 
 
 def main(host=LISTENING_ADDR, port=LISTENING_PORT):
-    print "\n:-------PythonProxy-------:\n"
-    print "Listening addr: " + LISTENING_ADDR
-    print "Listening port: " + str(LISTENING_PORT) + "\n"
-    print ":-------------------------:\n"
+    print("\n:-------WebSocket Proxy (OpenVPN)-------:")
+    print("Listening addr: " + LISTENING_ADDR)
+    print("Listening port: " + str(LISTENING_PORT))
+    print("Target: " + DEFAULT_HOST)
+    print("Python version: " + sys.version.split()[0])
+    print(":---------------------------------------:\n")
+    
     server = Server(LISTENING_ADDR, LISTENING_PORT)
     server.start()
+    
     while True:
         try:
             time.sleep(2)
         except KeyboardInterrupt:
-            print 'Stopping...'
+            print('\nStopping...')
             server.close()
             break
 
-#######    parse_args(sys.argv[1:])
+
 if __name__ == '__main__':
+    # Uncomment to enable command line arguments
+    # parse_args(sys.argv[1:])
     main()
