@@ -93,16 +93,16 @@ rm -rf bantwidth
 rm -rf ws-stunnel
 
 # TAMBAH MENU BARU PAKETSSH
-rm-rf m-usernew-ssh
-rm-rf m-usernew-vmess
-rm-rf m-usernew-vless
-rm-rf m-usernew-tr
-rm-rf m-usernew-ssh-trial
-rm-rf m-usernew-vmess-trial
-rm-rf m-usernew-vless-trial
-rm-rf m-userdelete-ssh
-rm-rf m-userdelete-vmess
-rm-rf m-userdelete-vless
+# rm-rf m-usernew-ssh
+# rm-rf m-usernew-vmess
+# rm-rf m-usernew-vless
+# rm-rf m-usernew-tr
+# rm-rf m-usernew-ssh-trial
+# rm-rf m-usernew-vmess-trial
+# rm-rf m-usernew-vless-trial
+# rm-rf m-userdelete-ssh
+# rm-rf m-userdelete-vmess
+# rm-rf m-userdelete-vless
 
 fun_bar() {
     CMD[0]="$1"
