@@ -387,7 +387,12 @@ echo -e " $COLOR1  $NC${WH}    🤍 CPU                ${COLOR1}: ${WH}$cpu_usag
 echo -e " $COLOR1  $NC${WH}    💙 CITY               ${COLOR1}: ${WH}$CITY${NC}"
 echo -e " $COLOR1  $NC${WH}    💛 IP VPS             ${COLOR1}: ${WH}$MYIP${NC}"
 echo -e " $COLOR1  $NC${WH}    🧡 DOMAIN UTAMA       ${COLOR1}: ${WH}$(cat /etc/xray/domain)"
-echo -e " $COLOR1  $NC${WH}    🧡 ALL SUBDOMAIN      ${COLOR1}: ${WH}$(cat /root/subdomainall)"
+# Check if subdomainall file exists and is not empty
+if [ -f /root/subdomainall ] && [ -s /root/subdomainall ]; then
+    echo -e " $COLOR1  $NC${WH}    🧡 ALL SUBDOMAIN      ${COLOR1}: ${WH}$(cat /root/subdomainall)"
+else
+    echo -e " $COLOR1  $NC${WH}    🧡 ALL SUBDOMAIN      ${COLOR1}: ${WH}-"
+fi
 echo -e " $COLOR1      ══════════════════════════════════════════════${NC}"
 echo -e " $COLOR1╭════════════════════════════════════════════════════════╮${NC}"
 echo -e " $COLOR1│ ${WH}               • PLATFROMS : $author • $NC"
