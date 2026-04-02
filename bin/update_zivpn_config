@@ -1,0 +1,31 @@
+#!/bin/bash
+# Helper script to update ZIVPN config.json
+# Format: Only passwords (not user:password)
+
+ZIVPN_DIR="/etc/zivpn"
+ZIVPN_USERS="$ZIVPN_DIR/users.txt"
+ZIVPN_CONFIG="$ZIVPN_DIR/config.json"
+
+if [ ! -f "$ZIVPN_USERS" ] || [ ! -f "$ZIVPN_CONFIG" ]; then
+    exit 1
+fi
+
+passwords_array="["
+first=true
+
+while IFS= read -r line; do
+    if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+        pass="${BASH_REMATCH[3]}"
+        if [ "$first" = true ]; then
+            passwords_array="$passwords_array\"$pass\""
+            first=false
+        else
+            passwords_array="$passwords_array,\"$pass\""
+        fi
+    fi
+done < "$ZIVPN_USERS"
+
+passwords_array="$passwords_array]"
+
+jq ".auth.config = $passwords_array" $ZIVPN_CONFIG > ${ZIVPN_CONFIG}.tmp && mv ${ZIVPN_CONFIG}.tmp $ZIVPN_CONFIG
+systemctl restart zivpn >/dev/null 2>&1

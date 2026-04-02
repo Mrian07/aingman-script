@@ -168,6 +168,14 @@ else
     systemctl start trojan-go
 fi
 
+stat_zivpn=$( systemctl status zivpn | grep Active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g' )
+if [[ $stat_zivpn == "running" ]]; then
+    stat_zivpn="${Green_font_prefix}ON${NC}"
+else
+    stat_zivpn="${Red_font_prefix}OFF${NC}"
+    systemctl start zivpn
+fi
+
 
 
 # STATUS EXPIRED ACTIVE
@@ -193,6 +201,12 @@ total_ssh=$(grep -c -E "^### " "/etc/xray/ssh")
 jumlah_noobz=$(grep -c -E "^### " "/etc/xray/noob")
 # TOTAL CREATE ACC TROJAN-GO
 jumlah_trgo=$(grep -c -E "^### " "/etc/trojan-go/trgo")
+# TOTAL CREATE ACC ZIVPN
+if [ -f "/etc/zivpn/users.txt" ]; then
+    jumlah_zivpn=$(grep -c -E "^### " "/etc/zivpn/users.txt" 2>/dev/null || echo "0")
+else
+    jumlah_zivpn="0"
+fi
 function m-ip2(){
 clear
 cd
@@ -388,13 +402,14 @@ echo -e " $COLOR1│$NC ${COLOR1}[${WH}3${COLOR1}]${NC}${COLOR1}• ${WH}VLESS  
 echo -e " $COLOR1│$NC ${COLOR1}[${WH}4${COLOR1}]${NC}${COLOR1}• ${WH}TROJAN    $COLOR1│$NC   ${status_xray}${NC}     $trtls Accounts    ${NC}  $yesterday_tx $yesterday_txv${NC}"
 echo -e " $COLOR1│$NC ${COLOR1}[${WH}5${COLOR1}]${NC}${COLOR1}• ${WH}NOOBZVPN  $COLOR1│$NC   ${stat_noobz}${NC}     $jumlah_noobz Accounts     ${NC} ${COLOR1}THIS MONTH ${NC}" 
 echo -e " $COLOR1│$NC ${COLOR1}[${WH}6${COLOR1}]${NC}${COLOR1}• ${WH}TROJAN-GO $COLOR1│$NC   ${stat_trgo}${NC}     $jumlah_trgo Accounts     ${NC} $month_tx $month_txv${NC}"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}7${COLOR1}]${NC}${COLOR1}• ${WH}UDP ZIVPN $COLOR1│$NC   ${stat_zivpn}${NC}     $jumlah_zivpn Accounts     ${NC} ${NC}"
 echo -e " $COLOR1╰════════════════╯╰══════╯╰═════════════╯╰═══════════════╯${NC}"
 echo -e " $COLOR1╭═══════════════════════════╮╭═══════════════════════════╮${NC}"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}7${COLOR1}]${NC}${COLOR1}• ${WH}DELETE ALL EXPIRED   $COLOR1││$NC ${COLOR1}[${WH}11${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT PANEL  $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}8${COLOR1}]${NC}${COLOR1}• ${WH}RUNNING SERVICE      $COLOR1││$NC ${COLOR1}[${WH}12${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT NOTIF  $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}9${COLOR1}]${NC}${COLOR1}• ${WH}RESTART SERVICE      $COLOR1││$NC ${COLOR1}[${WH}13${COLOR1}]${NC}${COLOR1}• ${WH}BACKUP & RESTORE    $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}10${COLOR1}]${NC}${COLOR1} ${WH}MENU SYSTEM          $COLOR1││$NC ${COLOR1}[${WH}14${COLOR1}]${NC}${COLOR1}• ${WH}REBOOT SERVER       $COLOR1│$NC"   
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}0${COLOR1}]${NC}${COLOR1}• ${WH}EXIT                 $COLOR1││$NC ${COLOR1}[${WH}15${COLOR1}]${NC}${COLOR1}• ${WH}ADD SUBDOMAIN       $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}8${COLOR1}]${NC}${COLOR1}• ${WH}DELETE ALL EXPIRED   $COLOR1││$NC ${COLOR1}[${WH}12${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT PANEL  $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}9${COLOR1}]${NC}${COLOR1}• ${WH}RUNNING SERVICE      $COLOR1││$NC ${COLOR1}[${WH}13${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT NOTIF  $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}10${COLOR1}]${NC}${COLOR1} ${WH}RESTART SERVICE      $COLOR1││$NC ${COLOR1}[${WH}14${COLOR1}]${NC}${COLOR1}• ${WH}BACKUP & RESTORE    $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}11${COLOR1}]${NC}${COLOR1} ${WH}MENU SYSTEM          $COLOR1││$NC ${COLOR1}[${WH}15${COLOR1}]${NC}${COLOR1}• ${WH}REBOOT SERVER       $COLOR1│$NC"   
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}0${COLOR1}]${NC}${COLOR1}• ${WH}EXIT                 $COLOR1││$NC ${COLOR1}[${WH}16${COLOR1}]${NC}${COLOR1}• ${WH}ADD SUBDOMAIN       $COLOR1│$NC"
 echo -e " $COLOR1╰═══════════════════════════╯╰═══════════════════════════╯${NC}"
 # if [ "$Isadmin" = "ON" ]; then 
 #     echo -e "$COLOR1╭════════════════════ • ${WH}PANEL ADMIN VIP${NC}${COLOR1} • ════════════════╮${NC}"
@@ -487,6 +502,7 @@ res1() {
     systemctl restart badvpn3
     systemctl restart client
     systemctl restart server
+    systemctl restart zivpn
 }
 clear
 echo -e "$COLOR1 ╭══════════════════════════════════════════╮${NC}"
@@ -508,7 +524,7 @@ chmod +x install_up.sh
 ./install_up.sh
 }
 echo -e ""
-echo -ne " ${WH}Select Menu 1-15 ${COLOR1}: ${WH}"; read opt
+echo -ne " ${WH}Select Menu 1-16 ${COLOR1}: ${WH}"; read opt
 case $opt in
 01 | 1) clear ; m-sshovpn ;;
 02 | 2) clear ; m-vmess ;;
@@ -516,15 +532,16 @@ case $opt in
 04 | 4) clear ; m-trojan ;;
 05 | 5) clear ; m-noobz ;;
 06 | 6) clear ; m-trgo ;;
-07 | 7) clear ; wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/ex.sh && chmod +x ex.sh && ./ex.sh ;;
-08 | 8) clear ; running ;;
-09 | 9) clear ; restartservice ;;
-10 | 10) clear ; m-system ;;
-11 | 11) clear ; m-bot ;;
-12 | 12) clear ; m-bot2 ;;
-13 | 13) clear ; m-backup ;;
-14 | 14) clear ; reboot ;;
-15 | 15) clear ; add_subdomain ;;
+07 | 7) clear ; m-zivpn ;;
+08 | 8) clear ; wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/ex.sh && chmod +x ex.sh && ./ex.sh ;;
+09 | 9) clear ; running ;;
+10 | 10) clear ; restartservice ;;
+11 | 11) clear ; m-system ;;
+12 | 12) clear ; m-bot ;;
+13 | 13) clear ; m-bot2 ;;
+14 | 14) clear ; m-backup ;;
+15 | 15) clear ; reboot ;;
+16 | 16) clear ; add_subdomain ;;
 esac
 
 
