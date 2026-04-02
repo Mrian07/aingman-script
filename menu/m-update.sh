@@ -179,6 +179,7 @@ wget -q -O /usr/bin/m-userdelete-vmess "https://raw.githubusercontent.com/Mrian0
 wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vless.sh" && chmod +x /usr/bin/m-userdelete-vless
 wget -q -O /usr/bin/hapus-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-trial.sh" && chmod +x /usr/bin/hapus-trial
 wget -q -O /usr/bin/hapus-expired "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-expired.sh" && chmod +x /usr/bin/hapus-expired
+wget -q -O /usr/bin/m-zivpn "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-zivpn.sh" && chmod +x /usr/bin/m-zivpn
 
 # Setup cronjob untuk hapus trial otomatis setiap 1 jam
 CRON_FILE="/etc/cron.d/hapus-trial-auto"
@@ -212,6 +213,7 @@ chmod +x m-vless
 chmod +x m-trojan
 chmod +x m-system
 chmod +x m-sshovpn
+chmod +x m-zivpn
 chmod +x m-ssws
 chmod +x running
 chmod +x m-update
