@@ -46,5 +46,7 @@ systemctl enable zivpn.service
 systemctl start zivpn.service
 iptables -t nat -A PREROUTING -p udp --dport 6000:19999 -j REDIRECT --to-port 5667
 rm zi.* 1> /dev/null 2> /dev/null
+systemctl restart zivpn.service
 echo -e "ZIVPN UDP Installed"
 clear
+
