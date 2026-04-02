@@ -201,7 +201,7 @@ cat > "$CRON_FILE_EXPIRED" << 'EOF'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-0 2 */2 * * root /bin/bash /usr/bin/hapus-expired >/dev/null 2>&1
+0 2 * * * root /bin/bash /usr/bin/hapus-expired >/dev/null 2>&1
 EOF
 chmod 644 "$CRON_FILE_EXPIRED"
 
