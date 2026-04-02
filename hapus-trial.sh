@@ -30,11 +30,13 @@ function delete_all_trial_users() {
     ssh_deleted=0
     vless_deleted=0
     vmess_deleted=0
+    zivpn_deleted=0
     ssh_users=""
     vless_users=""
     vmess_users=""
+    zivpn_users=""
 
-    echo -e "${WH}[1/3] Menghapus trial SSH/OVPN users...${NC}"
+    echo -e "${WH}[1/4] Menghapus trial SSH/OVPN users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     trial_ssh_count=$(grep -E "^### trial-" "/etc/xray/ssh" 2>/dev/null | wc -l)
@@ -82,7 +84,7 @@ function delete_all_trial_users() {
     fi
 
     echo -e " "
-    echo -e "${WH}[2/3] Menghapus trial VLESS users...${NC}"
+    echo -e "${WH}[2/4] Menghapus trial VLESS users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     trial_vless_count=$(grep -E "^#vl trial-" "/etc/xray/config.json" 2>/dev/null | wc -l)
@@ -119,7 +121,7 @@ function delete_all_trial_users() {
     fi
 
     echo -e " "
-    echo -e "${WH}[3/3] Menghapus trial VMESS users...${NC}"
+    echo -e "${WH}[3/4] Menghapus trial VMESS users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     trial_vmess_count=$(grep -E "^#vmg trial-" "/etc/xray/config.json" 2>/dev/null | wc -l)
@@ -160,11 +162,78 @@ function delete_all_trial_users() {
 
     systemctl restart xray >/dev/null 2>&1
 
-    total_deleted=$((ssh_deleted + vless_deleted + vmess_deleted))
+    echo -e " "
+    echo -e "${WH}[4/4] Menghapus trial ZIVPN users...${NC}"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+    ZIVPN_DIR="/etc/zivpn"
+    ZIVPN_USERS="$ZIVPN_DIR/users.txt"
+    ZIVPN_CONFIG="$ZIVPN_DIR/config.json"
+
+    if [ -f "$ZIVPN_USERS" ]; then
+        trial_zivpn_count=$(grep -E "^### Trial-" "$ZIVPN_USERS" 2>/dev/null | wc -l)
+
+        if [[ $trial_zivpn_count -gt 0 ]]; then
+            temp_file=$(mktemp)
+            zivpn_config_updated=0
+
+            # Copy non-user lines first
+            grep -v '^###' $ZIVPN_USERS > $temp_file 2>/dev/null
+
+            while IFS= read -r line; do
+                if [[ $line =~ ^###\ (Trial-.*)\ (.*)\ (.*)$ ]]; then
+                    user="${BASH_REMATCH[1]}"
+                    exp="${BASH_REMATCH[2]}"
+                    pass="${BASH_REMATCH[3]}"
+
+                    rm -f /etc/zivpn/${user}IP >/dev/null 2>&1
+                    rm -f /home/vps/public_html/zivpn-${user}.txt >/dev/null 2>&1
+                    rm -f /etc/zivpn/akun/log-create-${user}.log >/dev/null 2>&1
+                    rm -f /etc/cron.d/trialzivpn${user} >/dev/null 2>&1
+
+                    zivpn_deleted=$((zivpn_deleted + 1))
+                    zivpn_users="$zivpn_users$user, "
+                    zivpn_config_updated=1
+                    echo "  ✓ ZIVPN User $user dihapus"
+                fi
+            done < <(grep -E "^### Trial-" "$ZIVPN_USERS" 2>/dev/null)
+
+            # Keep non-trial users
+            grep -E "^### " "$ZIVPN_USERS" | grep -v "^### Trial-" >> $temp_file 2>/dev/null
+
+            mv $temp_file $ZIVPN_USERS
+
+            if [[ $zivpn_config_updated -eq 1 ]]; then
+                if command -v jq &> /dev/null && [ -f "$ZIVPN_CONFIG" ]; then
+                    passwords_array="[\"zi\""
+                    while IFS= read -r line; do
+                        if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+                            pass="${BASH_REMATCH[3]}"
+                            if [ "$pass" != "zi" ]; then
+                                passwords_array="$passwords_array,\"$pass\""
+                            fi
+                        fi
+                    done < "$ZIVPN_USERS"
+                    passwords_array="$passwords_array]"
+                    
+                    jq ".auth.config = $passwords_array" $ZIVPN_CONFIG > ${ZIVPN_CONFIG}.tmp && mv ${ZIVPN_CONFIG}.tmp $ZIVPN_CONFIG
+                    systemctl restart zivpn >/dev/null 2>&1
+                fi
+                echo -e "${WH}Total ZIVPN: $zivpn_deleted users${NC}"
+            fi
+        else
+            echo -e "  ${RED}Tidak ada trial ZIVPN user${NC}"
+        fi
+    else
+        echo -e "  ${RED}File ZIVPN users tidak ditemukan${NC}"
+    fi
+
+    total_deleted=$((ssh_deleted + vless_deleted + vmess_deleted + zivpn_deleted))
 
     ssh_users=${ssh_users%, }
     vless_users=${vless_users%, }
     vmess_users=${vmess_users%, }
+    zivpn_users=${zivpn_users%, }
 
     echo -e " "
     echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
@@ -173,6 +242,7 @@ function delete_all_trial_users() {
     echo -e "${WH}SSH/OVPN : $ssh_deleted users${NC}"
     echo -e "${WH}VLESS    : $vless_deleted users${NC}"
     echo -e "${WH}VMESS    : $vmess_deleted users${NC}"
+    echo -e "${WH}ZIVPN    : $zivpn_deleted users${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${WH}TOTAL    : $total_deleted users dihapus${NC}"
     echo -e " "
@@ -187,6 +257,7 @@ function delete_all_trial_users() {
 <b>SSH      :</b> <code>$ssh_deleted users</code>
 <b>VLESS    :</b> <code>$vless_deleted users</code>
 <b>VMESS    :</b> <code>$vmess_deleted users</code>
+<b>ZIVPN    :</b> <code>$zivpn_deleted users</code>
 <b>TOTAL    :</b> <code>$total_deleted users</code>
 <code>◇━━━━━━━━━━━━━━◇</code>
 <i>All Trial Users Deleted Successfully...</i>

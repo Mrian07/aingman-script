@@ -114,8 +114,8 @@ echo -e "$COLOR1╰════════════════════�
 read -n 1 -s -r -p "Press any key to back"
 usernew
 fi
-read -p "   Password   : " Pass
 done
+Pass=$Login
 until [[ $iplim =~ ^[0-9]+$ ]]; do
 read -p "   Limit User : " iplim
 done
@@ -235,7 +235,7 @@ read -p "Expired (Minutes): " timer
 done
 Login=Trial-`</dev/urandom tr -dc X-Z0-9 | head -c4`
 hari=0
-Pass=1
+Pass=$Login
 iplim=1
 if [ -z ${iplim} ]; then
 iplim="0"

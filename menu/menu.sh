@@ -410,11 +410,12 @@ echo -e " $COLOR1│$NC ${COLOR1}[${WH}6${COLOR1}]${NC}${COLOR1}• ${WH}TROJAN-
 echo -e " $COLOR1│$NC ${COLOR1}[${WH}7${COLOR1}]${NC}${COLOR1}• ${WH}UDP ZIVPN $COLOR1│$NC   ${stat_zivpn}${NC}     $jumlah_zivpn Accounts     ${NC} ${NC}"
 echo -e " $COLOR1╰════════════════╯╰══════╯╰═════════════╯╰═══════════════╯${NC}"
 echo -e " $COLOR1╭═══════════════════════════╮╭═══════════════════════════╮${NC}"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}8${COLOR1}]${NC}${COLOR1}• ${WH}DELETE ALL EXPIRED   $COLOR1││$NC ${COLOR1}[${WH}12${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT PANEL  $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}9${COLOR1}]${NC}${COLOR1}• ${WH}RUNNING SERVICE      $COLOR1││$NC ${COLOR1}[${WH}13${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT NOTIF  $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}10${COLOR1}]${NC}${COLOR1} ${WH}RESTART SERVICE      $COLOR1││$NC ${COLOR1}[${WH}14${COLOR1}]${NC}${COLOR1}• ${WH}BACKUP & RESTORE    $COLOR1│$NC"
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}11${COLOR1}]${NC}${COLOR1} ${WH}MENU SYSTEM          $COLOR1││$NC ${COLOR1}[${WH}15${COLOR1}]${NC}${COLOR1}• ${WH}REBOOT SERVER       $COLOR1│$NC"   
-echo -e " $COLOR1│$NC ${COLOR1}[${WH}0${COLOR1}]${NC}${COLOR1}• ${WH}EXIT                 $COLOR1││$NC ${COLOR1}[${WH}16${COLOR1}]${NC}${COLOR1}• ${WH}ADD SUBDOMAIN       $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}8${COLOR1}]${NC}${COLOR1}• ${WH}DELETE ALL EXPIRED   $COLOR1││$NC ${COLOR1}[${WH}13${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT NOTIF  $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}9${COLOR1}]${NC}${COLOR1}• ${WH}DELETE ALL TRIAL     $COLOR1││$NC ${COLOR1}[${WH}14${COLOR1}]${NC}${COLOR1}• ${WH}BACKUP & RESTORE    $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}10${COLOR1}]${NC}${COLOR1} ${WH}RUNNING SERVICE      $COLOR1││$NC ${COLOR1}[${WH}15${COLOR1}]${NC}${COLOR1}• ${WH}REBOOT SERVER       $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}11${COLOR1}]${NC}${COLOR1} ${WH}RESTART SERVICE      $COLOR1││$NC ${COLOR1}[${WH}16${COLOR1}]${NC}${COLOR1}• ${WH}ADD SUBDOMAIN       $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}12${COLOR1}]${NC}${COLOR1} ${WH}MENU SYSTEM          $COLOR1││$NC ${COLOR1}[${WH}17${COLOR1}]${NC}${COLOR1}• ${WH}TELEGRAM BOT PANEL  $COLOR1│$NC"
+echo -e " $COLOR1│$NC ${COLOR1}[${WH}0${COLOR1}]${NC}${COLOR1}• ${WH}EXIT                 $COLOR1││$NC ${COLOR1}                        $COLOR1│$NC"
 echo -e " $COLOR1╰═══════════════════════════╯╰═══════════════════════════╯${NC}"
 # if [ "$Isadmin" = "ON" ]; then 
 #     echo -e "$COLOR1╭════════════════════ • ${WH}PANEL ADMIN VIP${NC}${COLOR1} • ════════════════╮${NC}"
@@ -529,7 +530,7 @@ chmod +x install_up.sh
 ./install_up.sh
 }
 echo -e ""
-echo -ne " ${WH}Select Menu 1-16 ${COLOR1}: ${WH}"; read opt
+echo -ne " ${WH}Select Menu 1-17 ${COLOR1}: ${WH}"; read opt
 case $opt in
 01 | 1) clear ; m-sshovpn ;;
 02 | 2) clear ; m-vmess ;;
@@ -538,15 +539,16 @@ case $opt in
 05 | 5) clear ; m-noobz ;;
 06 | 6) clear ; m-trgo ;;
 07 | 7) clear ; m-zivpn ;;
-08 | 8) clear ; wget https://raw.githubusercontent.com/Mrian07/aingman-script/main/ex.sh && chmod +x ex.sh && ./ex.sh ;;
-09 | 9) clear ; running ;;
-10 | 10) clear ; restartservice ;;
-11 | 11) clear ; m-system ;;
-12 | 12) clear ; m-bot ;;
+08 | 8) clear ; hapus-expired ;;
+09 | 9) clear ; hapus-trial ;;
+10 | 10) clear ; running ;;
+11 | 11) clear ; restartservice ;;
+12 | 12) clear ; m-system ;;
 13 | 13) clear ; m-bot2 ;;
 14 | 14) clear ; m-backup ;;
 15 | 15) clear ; reboot ;;
 16 | 16) clear ; add_subdomain ;;
+17 | 17) clear ; m-bot ;;
 esac
 
 

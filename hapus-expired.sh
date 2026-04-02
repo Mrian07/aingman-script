@@ -31,18 +31,21 @@ function delete_all_expired_users() {
     vless_deleted=0
     vmess_deleted=0
     trojan_deleted=0
+    zivpn_deleted=0
     ssh_users=""
     vless_users=""
     vmess_users=""
     trojan_users=""
+    zivpn_users=""
 
     today=$(date +%Y-%m-%d)
+    today_timestamp=$(date -d "$today" +%s)
     current_user=$(whoami)
 
     # Dapatkan daftar user yang sedang login via SSH
     logged_users=$(who | awk '{print $1}' | sort -u)
 
-    echo -e "${WH}[1/4] Menghapus expired SSH/OVPN users...${NC}"
+    echo -e "${WH}[1/5] Menghapus expired SSH/OVPN users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     if [ -f /etc/xray/ssh ]; then
@@ -102,7 +105,7 @@ function delete_all_expired_users() {
     fi
 
     echo -e " "
-    echo -e "${WH}[2/4] Menghapus expired VLESS users...${NC}"
+    echo -e "${WH}[2/5] Menghapus expired VLESS users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     if [ -f /etc/xray/config.json ]; then
@@ -149,7 +152,7 @@ function delete_all_expired_users() {
     fi
 
     echo -e " "
-    echo -e "${WH}[3/4] Menghapus expired VMESS users...${NC}"
+    echo -e "${WH}[3/5] Menghapus expired VMESS users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     if [ -f /etc/xray/config.json ]; then
@@ -194,7 +197,7 @@ function delete_all_expired_users() {
     fi
 
     echo -e " "
-    echo -e "${WH}[4/4] Menghapus expired TROJAN users...${NC}"
+    echo -e "${WH}[4/5] Menghapus expired TROJAN users...${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     if [ -f /etc/xray/config.json ]; then
@@ -242,12 +245,83 @@ function delete_all_expired_users() {
         systemctl restart xray >/dev/null 2>&1
     fi
 
-    total_deleted=$((ssh_deleted + vless_deleted + vmess_deleted + trojan_deleted))
+    echo -e " "
+    echo -e "${WH}[5/5] Menghapus expired ZIVPN users...${NC}"
+    echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+    ZIVPN_DIR="/etc/zivpn"
+    ZIVPN_USERS="$ZIVPN_DIR/users.txt"
+    ZIVPN_CONFIG="$ZIVPN_DIR/config.json"
+
+    if [ -f "$ZIVPN_USERS" ]; then
+        temp_file=$(mktemp)
+        zivpn_config_updated=0
+
+        while IFS= read -r line; do
+            if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+                user="${BASH_REMATCH[1]}"
+                exp="${BASH_REMATCH[2]}"
+                pass="${BASH_REMATCH[3]}"
+
+                # Hanya proses user dengan prefix premium_ atau Trial-
+                if [[ ! "$user" =~ ^(premium_|Trial-) ]]; then
+                    echo "$line" >> "$temp_file"
+                    continue
+                fi
+
+                exp_timestamp=$(date -d "$exp" +%s 2>/dev/null)
+
+                if [ $? -eq 0 ] && [ $exp_timestamp -le $today_timestamp ]; then
+                    rm -f /etc/zivpn/${user}IP >/dev/null 2>&1
+                    rm -f /home/vps/public_html/zivpn-${user}.txt >/dev/null 2>&1
+                    rm -f /etc/zivpn/akun/log-create-${user}.log >/dev/null 2>&1
+                    rm -f /etc/cron.d/trialzivpn${user} >/dev/null 2>&1
+
+                    zivpn_deleted=$((zivpn_deleted + 1))
+                    zivpn_users="$zivpn_users$user, "
+                    zivpn_config_updated=1
+                    echo "  ✓ ZIVPN User $user (expired: $exp) dihapus"
+                else
+                    echo "$line" >> "$temp_file"
+                fi
+            else
+                echo "$line" >> "$temp_file"
+            fi
+        done < "$ZIVPN_USERS"
+
+        mv "$temp_file" "$ZIVPN_USERS"
+
+        if [[ $zivpn_config_updated -eq 1 ]]; then
+            if command -v jq &> /dev/null && [ -f "$ZIVPN_CONFIG" ]; then
+                passwords_array="[\"zi\""
+                while IFS= read -r line; do
+                    if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+                        pass="${BASH_REMATCH[3]}"
+                        if [ "$pass" != "zi" ]; then
+                            passwords_array="$passwords_array,\"$pass\""
+                        fi
+                    fi
+                done < "$ZIVPN_USERS"
+                passwords_array="$passwords_array]"
+                
+                jq ".auth.config = $passwords_array" $ZIVPN_CONFIG > ${ZIVPN_CONFIG}.tmp && mv ${ZIVPN_CONFIG}.tmp $ZIVPN_CONFIG
+                systemctl restart zivpn >/dev/null 2>&1
+            fi
+            echo -e "${WH}Total ZIVPN: $zivpn_deleted users${NC}"
+        else
+            echo -e "  ${RED}Tidak ada expired ZIVPN user${NC}"
+        fi
+    else
+        echo -e "  ${RED}File ZIVPN users tidak ditemukan${NC}"
+    fi
+
+    total_deleted=$((ssh_deleted + vless_deleted + vmess_deleted + trojan_deleted + zivpn_deleted))
 
     ssh_users=${ssh_users%, }
     vless_users=${vless_users%, }
     vmess_users=${vmess_users%, }
     trojan_users=${trojan_users%, }
+    zivpn_users=${zivpn_users%, }
 
     echo -e " "
     echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
@@ -257,6 +331,7 @@ function delete_all_expired_users() {
     echo -e "${WH}VLESS    : $vless_deleted users${NC}"
     echo -e "${WH}VMESS    : $vmess_deleted users${NC}"
     echo -e "${WH}TROJAN   : $trojan_deleted users${NC}"
+    echo -e "${WH}ZIVPN    : $zivpn_deleted users${NC}"
     echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${WH}TOTAL    : $total_deleted users dihapus${NC}"
     echo -e " "
@@ -272,6 +347,7 @@ function delete_all_expired_users() {
 <b>VLESS    :</b> <code>$vless_deleted users</code>
 <b>VMESS    :</b> <code>$vmess_deleted users</code>
 <b>TROJAN   :</b> <code>$trojan_deleted users</code>
+<b>ZIVPN    :</b> <code>$zivpn_deleted users</code>
 <b>TOTAL    :</b> <code>$total_deleted users</code>
 <code>◇━━━━━━━━━━━━━━◇</code>
 <i>All Expired Users Deleted Successfully...</i>
