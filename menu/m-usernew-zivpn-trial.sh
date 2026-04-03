@@ -96,8 +96,9 @@ if [ -z ${iplim} ]; then
 iplim="0"
 fi
 echo "$iplim" > /etc/zivpn/${Login}IP
-expi=`date -d "$hari days" +"%Y-%m-%d"`
-exp="$(date -d "$hari days" +"%Y-%m-%d")"
+# Set expired date untuk trial (hari ini karena menggunakan menit)
+expi=`date +"%Y-%m-%d"`
+exp="$(date +"%Y-%m-%d")"
 echo -e "### $Login $expi $Pass" >> $ZIVPN_USERS
 update_zivpn_config
 cat > /home/vps/public_html/zivpn-$Login.txt <<-END
@@ -142,18 +143,86 @@ else
 echo "$TEXT" > /etc/notiftele
 bash /etc/tele
 fi
-cat> /etc/cron.d/trialzivpn${Login} << EOF
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/$timer * * * * root /usr/bin/trial zivpn $Login $Pass $expi
-EOF
+
+# Setup auto delete menggunakan AT Command
+# Install at service jika belum ada
+if ! command -v at >/dev/null 2>&1; then
+    apt-get update >/dev/null 2>&1
+    apt-get install -y at >/dev/null 2>&1
+fi
+systemctl enable atd >/dev/null 2>&1
+systemctl start atd >/dev/null 2>&1
+
+# Buat script auto delete
+cat > /tmp/delete_trial_zivpn_${Login}.sh << 'EOFSCRIPT'
+#!/bin/bash
+# Auto delete script untuk trial ZIVPN user: ${Login}
+LOGIN="${Login}"
+PASS="${Pass}"
+EXPI="${expi}"
+
+echo "Starting auto delete for ZIVPN user: $LOGIN"
+
+# Delete dari users.txt
+sed -i "/^### $LOGIN $EXPI $PASS/d" /etc/zivpn/users.txt >/dev/null 2>&1
+
+# Remove IP limit file
+rm -f /etc/zivpn/${LOGIN}IP >/dev/null 2>&1
+
+# Remove public HTML file
+rm -f /home/vps/public_html/zivpn-${LOGIN}.txt >/dev/null 2>&1
+
+# Remove log file
+rm -f /etc/zivpn/akun/log-create-${LOGIN}.log >/dev/null 2>&1
+
+# Update config.json (remove password)
+if command -v jq &> /dev/null; then
+    ZIVPN_CONFIG="/etc/zivpn/config.json"
+    ZIVPN_USERS="/etc/zivpn/users.txt"
+    
+    passwords_array="["
+    passwords_array="$passwords_array\"zi\""
+    
+    while IFS= read -r line; do
+        if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+            pass="${BASH_REMATCH[3]}"
+            if [ "$pass" != "zi" ]; then
+                passwords_array="$passwords_array,\"$pass\""
+            fi
+        fi
+    done < "$ZIVPN_USERS"
+    
+    passwords_array="$passwords_array]"
+    jq ".auth.config = $passwords_array" $ZIVPN_CONFIG > ${ZIVPN_CONFIG}.tmp && mv ${ZIVPN_CONFIG}.tmp $ZIVPN_CONFIG
+    
+    # Restart service
+    systemctl restart zivpn >/dev/null 2>&1
+fi
+
+# Cleanup script
+rm /tmp/delete_trial_zivpn_${LOGIN}.sh >/dev/null 2>&1
+
+echo "Auto delete completed for ZIVPN user: $LOGIN"
+EOFSCRIPT
+
+# Replace variables in script
+sed -i "s/\${Login}/$Login/g" /tmp/delete_trial_zivpn_${Login}.sh
+sed -i "s/\${Pass}/$Pass/g" /tmp/delete_trial_zivpn_${Login}.sh
+sed -i "s/\${expi}/$expi/g" /tmp/delete_trial_zivpn_${Login}.sh
+chmod +x /tmp/delete_trial_zivpn_${Login}.sh
+echo "/tmp/delete_trial_zivpn_${Login}.sh" | at now + ${timer} minutes >/dev/null 2>&1
+delete_info="AT Command (${timer} menit dari sekarang)"
+
 clear
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ${NC} ${WH}• Trial ZIVPN Premium Account • " | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 $NC  ${WH}Username   ${COLOR1}: ${WH}$Login"  | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 $NC  ${WH}Password   ${COLOR1}: ${WH}$Pass" | tee -a /etc/zivpn/akun/log-create-${Login}.log
-echo -e "$COLOR1 $NC  ${WH}Expired On ${COLOR1}: ${WH}$timer Minutes"  | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 $NC  ${WH}Masa Aktif ${COLOR1}: ${WH}$timer Minutes"  | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 $NC  ${WH}Expired On ${COLOR1}: ${WH}$exp"  | tee -a /etc/zivpn/akun/log-create-${Login}.log
+auto_delete_time=$(date -d "+${timer} minutes" "+%Y-%m-%d %H:%M:%S")
+echo -e "$COLOR1 $NC  ${WH}Auto Delete${COLOR1}: ${WH}$auto_delete_time WIB" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 $NC  ${WH}ISP        ${COLOR1}: ${WH}$ISP" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 $NC  ${WH}City       ${COLOR1}: ${WH}$CITY" | tee -a /etc/zivpn/akun/log-create-${Login}.log
@@ -161,11 +230,12 @@ echo -e "$COLOR1 $NC  ${WH}Host       ${COLOR1}: ${WH}$domain" | tee -a /etc/ziv
 echo -e "$COLOR1 $NC  ${WH}Login Limit${COLOR1}: ${WH}${iplim} IP" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 $NC  ${WH}Port ZIVPN ${COLOR1}: ${WH}$ZIVPN_PORT" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
-echo -e "$COLOR1 ${NC}  ${WH}Save Link Acount    : " | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 ${NC}  ${WH}ZIVPN UDP: ${WH}$domain:6000-19999@$Login:$Pass" | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 ${NC}  ${WH}Save Link Account: " | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ${NC}  ${WH}http://$domain:89/zivpn-$Login.txt${NC}$COLOR1 $NC" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
+echo -e "$COLOR1 ${NC}Terimakasih Sudah Order Di " | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ${NC}    ${WH}• $author •${NC}                 $COLOR1 $NC" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo -e "$COLOR1 ◇━━━━━━━━━━━━━━━━━◇ ${NC}" | tee -a /etc/zivpn/akun/log-create-${Login}.log
 echo "" | tee -a /etc/zivpn/akun/log-create-${Login}.log
-read -n 1 -s -r -p "Press any key to back on menu"
-menu
