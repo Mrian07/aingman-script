@@ -85,10 +85,28 @@ echo -e "$COLOR1╭════════════════════�
 echo -e "$COLOR1│${NC} ${COLBG1}           ${WH}• TRIAL ZIVPN Account •          ${NC} $COLOR1│ $NC"
 echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
 echo -e ""
+until [[ $Login =~ ^[a-zA-Z0-9_.-]+$ && ${CLIENT_EXISTS} == '0' ]]; do
+read -p "Username: " Login
+CLIENT_EXISTS=$(grep -w $Login $ZIVPN_USERS | wc -l)
+if [[ ${CLIENT_EXISTS} == '1' ]]; then
+clear
+echo -e " "
+echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+echo -e "$COLOR1│${NC} ${COLBG1}           ${WH}• TRIAL ZIVPN Account •          ${NC} $COLOR1│ $NC"
+echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+echo -e " "
+echo -e "$COLOR1╭═════════════════════════════════════════════════╮${NC}"
+echo -e "$COLOR1│                                                 │"
+echo -e "$COLOR1│${WH} Nama Duplikat Silahkan Buat Nama Lain.          $COLOR1│"
+echo -e "$COLOR1│                                                 │"
+echo -e "$COLOR1╰═════════════════════════════════════════════════╯${NC}"
+echo -e " "
+echo -e " "
+fi
+done
 until [[ $timer =~ ^[0-9]+$ ]]; do
 read -p "Expired (Minutes): " timer
 done
-Login=Trial-`</dev/urandom tr -dc X-Z0-9 | head -c4`
 hari=0
 Pass=$Login
 iplim=1
