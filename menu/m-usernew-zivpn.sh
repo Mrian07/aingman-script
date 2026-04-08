@@ -42,6 +42,15 @@ fi
 
 # Helper function to update config.json (passwords only)
 function update_zivpn_config() {
+    # Validate config.json exists
+    if [ ! -f "$ZIVPN_CONFIG" ]; then
+        echo "Error: config.json not found at $ZIVPN_CONFIG"
+        return 1
+    fi
+    
+    # Backup config.json before modification
+    cp "$ZIVPN_CONFIG" "${ZIVPN_CONFIG}.backup" 2>/dev/null
+    
     local passwords_array="["
     local first=true
     
@@ -50,21 +59,50 @@ function update_zivpn_config() {
     first=false
     
     # Add user passwords from users.txt
-    while IFS= read -r line; do
-        if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
-            pass="${BASH_REMATCH[3]}"
-            # Skip if password is "zi" (already added)
-            if [ "$pass" != "zi" ]; then
-                passwords_array="$passwords_array,\"$pass\""
+    if [ -f "$ZIVPN_USERS" ]; then
+        while IFS= read -r line; do
+            if [[ $line =~ ^###\ (.*)\ (.*)\ (.*)$ ]]; then
+                pass="${BASH_REMATCH[3]}"
+                # Skip if password is "zi" (already added)
+                if [ "$pass" != "zi" ]; then
+                    passwords_array="$passwords_array,\"$pass\""
+                fi
             fi
-        fi
-    done < "$ZIVPN_USERS"
+        done < "$ZIVPN_USERS"
+    fi
     
     passwords_array="$passwords_array]"
     
-    # Update config.json
+    # Update config.json with validation
     if command -v jq &> /dev/null; then
-        jq ".auth.config = $passwords_array" $ZIVPN_CONFIG > ${ZIVPN_CONFIG}.tmp && mv ${ZIVPN_CONFIG}.tmp $ZIVPN_CONFIG
+        # Try to update config.json
+        if jq ".auth.config = $passwords_array" "$ZIVPN_CONFIG" > "${ZIVPN_CONFIG}.tmp" 2>/dev/null; then
+            # Validate the new config is valid JSON
+            if jq empty "${ZIVPN_CONFIG}.tmp" 2>/dev/null; then
+                # Validate the new config has required fields
+                if jq -e '.listen and .auth' "${ZIVPN_CONFIG}.tmp" >/dev/null 2>&1; then
+                    mv "${ZIVPN_CONFIG}.tmp" "$ZIVPN_CONFIG"
+                else
+                    echo "Error: Generated config.json is missing required fields"
+                    rm -f "${ZIVPN_CONFIG}.tmp"
+                    # Restore from backup
+                    [ -f "${ZIVPN_CONFIG}.backup" ] && cp "${ZIVPN_CONFIG}.backup" "$ZIVPN_CONFIG"
+                    return 1
+                fi
+            else
+                echo "Error: Generated config.json is invalid JSON"
+                rm -f "${ZIVPN_CONFIG}.tmp"
+                # Restore from backup
+                [ -f "${ZIVPN_CONFIG}.backup" ] && cp "${ZIVPN_CONFIG}.backup" "$ZIVPN_CONFIG"
+                return 1
+            fi
+        else
+            echo "Error: jq failed to process config.json"
+            rm -f "${ZIVPN_CONFIG}.tmp"
+            # Restore from backup
+            [ -f "${ZIVPN_CONFIG}.backup" ] && cp "${ZIVPN_CONFIG}.backup" "$ZIVPN_CONFIG"
+            return 1
+        fi
     else
         echo "Warning: jq not installed, cannot update config.json"
         return 1
@@ -76,9 +114,18 @@ function update_zivpn_config() {
     
     # Verify service started
     if ! systemctl is-active --quiet zivpn; then
-        echo "Warning: ZIVPN service failed to restart"
+        echo "Warning: ZIVPN service failed to restart, restoring backup"
+        # Restore from backup if service failed
+        if [ -f "${ZIVPN_CONFIG}.backup" ]; then
+            cp "${ZIVPN_CONFIG}.backup" "$ZIVPN_CONFIG"
+            systemctl restart zivpn >/dev/null 2>&1
+        fi
         return 1
     fi
+    
+    # Cleanup backup after successful update
+    rm -f "${ZIVPN_CONFIG}.backup"
+    return 0
 }
 
 clear
