@@ -1,6 +1,7 @@
 #!/bin/bash
+apt install jq curl -y
 DOMAIN=vipserver.pw
-sub=$(cat /root/subdomainadd)
+sub=$(cat /root/subdomainx)
 dns=${sub}.vipserver.pw
 dns2=*.${sub}.vipserver.pw
 CF_ID=ahmadardhiansyah2020@gmail.com
@@ -38,4 +39,6 @@ RESULT=$(curl -sLX PUT "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_r
 -H "X-Auth-Key: ${CF_KEY}" \
 -H "Content-Type: application/json" \
 --data '{"type":"A","name":"'${dns2}'","content":"'${IP}'","ttl":120,"proxied":false}')
+echo $dns > /root/domain
+echo "$dns" > /etc/xray/domain
 echo "$dn!
