@@ -157,18 +157,18 @@ chmod +x /usr/sbin/badvpn > /dev/null 2>&1
 wget -q -O /etc/systemd/system/badvpn1.service "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/badvpn1.service" >/dev/null 2>&1
 wget -q -O /etc/systemd/system/badvpn2.service "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/badvpn2.service" >/dev/null 2>&1
 wget -q -O /etc/systemd/system/badvpn3.service "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/badvpn3.service" >/dev/null 2>&1
-systemctl disable badvpn1 
-systemctl stop badvpn1 
+systemctl disable badvpn1
+systemctl stop badvpn1
 systemctl enable badvpn1
-systemctl start badvpn1 
-systemctl disable badvpn2 
-systemctl stop badvpn2 
+systemctl start badvpn1
+systemctl disable badvpn2
+systemctl stop badvpn2
 systemctl enable badvpn2
-systemctl start badvpn2 
-systemctl disable badvpn3 
-systemctl stop badvpn3 
+systemctl start badvpn2
+systemctl disable badvpn3
+systemctl stop badvpn3
 systemctl enable badvpn3
-systemctl start badvpn3 
+systemctl start badvpn3
 
 
 # setting port ssh
@@ -183,15 +183,31 @@ sed -i '/Port 22/a Port 22' /etc/ssh/sshd_config
 /etc/init.d/ssh restart
 
 echo "=== Install Dropbear ==="
-# install dropbear
-apt -y install dropbear
-sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=143/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 50000 -p 109 -p 110 -p 69"/g' /etc/default/dropbear
-echo "/bin/false" >> /etc/shells
-echo "/usr/sbin/nologin" >> /etc/shells
-/etc/init.d/ssh restart
-/etc/init.d/dropbear restart
+# 1. Install Dropbear
+apt update && apt install -y dropbear
+
+# 2. Timpa Konfigurasi Langsung (Overide)
+cat <<EOF > /etc/default/dropbear
+# Konfigurasi Dropbear otomatis
+NO_START=0
+DROPBEAR_PORT=143
+DROPBEAR_EXTRA_ARGS="-p 50000 -p 109 -p 110 -p 69"
+DROPBEAR_BANNER=""
+DROPBEAR_RECEIVE_WINDOW=65536
+EOF
+
+# 3. Tambahkan Shell agar user tunneling bisa login
+# Kita cek dulu supaya tidak double input jika script dijalankan ulang
+grep -qxf "/bin/false" /etc/shells || echo "/bin/false" >> /etc/shells
+grep -qxf "/usr/sbin/nologin" /etc/shells || echo "/usr/sbin/nologin" >> /etc/shells
+
+# 4. Restart Service menggunakan systemctl (Standar Ubuntu modern)
+systemctl daemon-reload
+systemctl enable dropbear
+systemctl restart ssh
+systemctl restart dropbear
+
+echo "=== Dropbear Berhasil Dikonfigurasi ==="
 
 # // install squid for debian 9,10 & ubuntu 20.04
 #apt -y install squid3
@@ -202,21 +218,21 @@ echo "/usr/sbin/nologin" >> /etc/shells
 #sed -i $MYIP2 /etc/squid/squid.conf
 
 # setting vnstat
-apt -y install vnstat
-/etc/init.d/vnstat restart
-apt -y install libsqlite3-dev
-wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
-tar zxvf vnstat-2.6.tar.gz
-cd vnstat-2.6
-./configure --prefix=/usr --sysconfdir=/etc && make && make install
-cd
-vnstat -u -i $NET
-sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
-chown vnstat:vnstat /var/lib/vnstat -R
-systemctl enable vnstat
-/etc/init.d/vnstat restart
-rm -f /root/vnstat-2.6.tar.gz
-rm -rf /root/vnstat-2.6
+# apt -y install vnstat
+# /etc/init.d/vnstat restart
+# apt -y install libsqlite3-dev
+# wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
+# tar zxvf vnstat-2.6.tar.gz
+# cd vnstat-2.6
+# ./configure --prefix=/usr --sysconfdir=/etc && make && make install
+# cd
+# vnstat -u -i $NET
+# sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
+# chown vnstat:vnstat /var/lib/vnstat -R
+# systemctl enable vnstat
+# /etc/init.d/vnstat restart
+# rm -f /root/vnstat-2.6.tar.gz
+# rm -rf /root/vnstat-2.6
 
 cd
 # install stunnel

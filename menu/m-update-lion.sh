@@ -93,10 +93,16 @@ rm -rf bantwidth
 rm -rf ws-stunnel
 
 # TAMBAH MENU BARU PAKETSSH
-rm-rf m-usernew-ssh
-rm-rf m-usernew-vmess
-rm-rf m-usernew-vless
-rm-rf m-usernew-tr
+# rm-rf m-usernew-ssh
+# rm-rf m-usernew-vmess
+# rm-rf m-usernew-vless
+# rm-rf m-usernew-tr
+# rm-rf m-usernew-ssh-trial
+# rm-rf m-usernew-vmess-trial
+# rm-rf m-usernew-vless-trial
+# rm-rf m-userdelete-ssh
+# rm-rf m-userdelete-vmess
+# rm-rf m-userdelete-vless
 
 fun_bar() {
     CMD[0]="$1"
@@ -125,9 +131,10 @@ fun_bar() {
     tput cnorm
 }
 res1() {
-    
-wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu-lion.sh" && chmod +x /usr/bin/menu
+
+wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu.sh" && chmod +x /usr/bin/menu
 wget -q -O /usr/bin/m-trgo "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-trgo.sh" && chmod +x /usr/bin/m-trgo
+wget -q -O /usr/bin/m-zivpn "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-zivpn.sh" && chmod +x /usr/bin/m-zivpn
 wget -q -O /usr/bin/restore "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/restore.sh" && chmod +x /usr/bin/restore
 wget -q -O /usr/bin/backup "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/backup.sh" && chmod +x /usr/bin/backup
 wget -q -O /usr/bin/addnoobz "https://raw.githubusercontent.com/Mrian07/aingman-script/main/bot/addnoobz.sh" && chmod +x /usr/bin/addnoobz
@@ -158,17 +165,59 @@ wget -q -O /usr/bin/trialtrojan "https://raw.githubusercontent.com/Mrian07/aingm
 wget -q -O /usr/bin/trialssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/trialssh.sh" && chmod +x /usr/bin/trialssh
 wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/autocpu.sh" && chmod +x /usr/bin/autocpu
 wget -q -O /usr/bin/bantwidth "https://raw.githubusercontent.com/Mrian07/aingman-script/main/install/bantwidth" && chmod +x /usr/bin/bantwidth
-wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshwss/ws-stunnel" && chmod +x /usr/bin/autocpu
+wget -q -O /usr/bin/autocpu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/sshws/ws-stunnel" && chmod +x /usr/bin/autocpu
 wget -q -O /usr/bin/m-usernew-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh.sh" && chmod +x /usr/bin/m-usernew-ssh
 wget -q -O /usr/bin/m-usernew-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess.sh" && chmod +x /usr/bin/m-usernew-vmess
 wget -q -O /usr/bin/m-usernew-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless.sh" && chmod +x /usr/bin/m-usernew-vless
 wget -q -O /usr/bin/m-usernew-tr "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr.sh" && chmod +x /usr/bin/m-usernew-tr
+wget -q -O /usr/bin/m-usernew-ssh-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-ssh-trial.sh" && chmod +x /usr/bin/m-usernew-ssh-trial
+wget -q -O /usr/bin/m-usernew-vmess-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vmess-trial.sh" && chmod +x /usr/bin/m-usernew-vmess-trial
+wget -q -O /usr/bin/m-usernew-vless-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-vless-trial.sh" && chmod +x /usr/bin/m-usernew-vless-trial
+wget -q -O /usr/bin/m-usernew-tr-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-tr-trial.sh" && chmod +x /usr/bin/m-usernew-tr-trial
+wget -q -O /usr/bin/m-userdelete-ssh "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-ssh.sh" && chmod +x /usr/bin/m-userdelete-ssh
+wget -q -O /usr/bin/m-userdelete-vmess "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vmess.sh" && chmod +x /usr/bin/m-userdelete-vmess
+wget -q -O /usr/bin/m-userdelete-vless "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-userdelete-vless.sh" && chmod +x /usr/bin/m-userdelete-vless
+wget -q -O /usr/bin/m-usernew-zivpn-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-zivpn-trial.sh" && chmod +x /usr/bin/m-usernew-zivpn-trial
+wget -q -O /usr/bin/m-usernew-zivpn "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-zivpn.sh" && chmod +x /usr/bin/m-usernew-zivpn
+wget -q -O /usr/bin/hapus-trial "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-trial.sh" && chmod +x /usr/bin/hapus-trial
+wget -q -O /usr/bin/hapus-expired "https://raw.githubusercontent.com/Mrian07/aingman-script/main/hapus-expired.sh" && chmod +x /usr/bin/hapus-expired
+wget -q -O /usr/bin/m-zivpn "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-zivpn.sh" && chmod +x /usr/bin/m-zivpn
+wget -q -O /usr/bin/m-usernew-noobz "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-usernew-noobz.sh" && chmod +x /usr/bin/m-usernew-noobz
+
+
+# Setup cronjob untuk hapus trial otomatis setiap 1 jam
+CRON_FILE="/etc/cron.d/hapus-trial-auto"
+cat > "$CRON_FILE" << 'EOF'
+# Cronjob untuk menghapus semua trial users setiap 1 jam
+# Dijalankan setiap jam pada menit ke-0 (00:00, 01:00, 02:00, dst)
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 * * * * root /bin/bash /usr/bin/hapus-trial >/dev/null 2>&1
+EOF
+chmod 644 "$CRON_FILE"
+
+# Setup cronjob untuk hapus expired users setiap 2 hari sekali
+CRON_FILE_EXPIRED="/etc/cron.d/hapus-expired-auto"
+cat > "$CRON_FILE_EXPIRED" << 'EOF'
+# Cronjob untuk menghapus semua expired users setiap 2 hari sekali
+# Dijalankan setiap 2 hari jam 02:00 (dini hari)
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 2 * * * root /bin/bash /usr/bin/hapus-expired >/dev/null 2>&1
+EOF
+chmod 644 "$CRON_FILE_EXPIRED"
+
+chmod +x hapus-trial
+chmod +x hapus-expired
 chmod +x menu
 chmod +x m-vmess
 chmod +x m-vless
 chmod +x m-trojan
 chmod +x m-system
 chmod +x m-sshovpn
+chmod +x m-zivpn
 chmod +x m-ssws
 chmod +x running
 chmod +x m-update
@@ -197,6 +246,16 @@ chmod +x m-usernew-ssh
 chmod +x m-usernew-vmess
 chmod +x m-usernew-vless
 chmod +x m-usernew-tr
+chmod +x m-usernew-ssh-trial
+chmod +x m-usernew-vmess-trial
+chmod +x m-usernew-vless-trial
+chmod +x m-usernew-tr-trial
+chmod +x m-userdelete-ssh
+chmod +x m-userdelete-vmess
+chmod +x m-userdelete-vless
+chmod +x hapus-trial
+chmod +x hapus-expired
+chmod +x m-usernew-noobz
 clear
 
 }
