@@ -1,8 +1,8 @@
 #!/bin/bash
-DOMAIN=serverkit.pw
+DOMAIN=vipserver.pw
 sub=$(cat /root/subdomainadd)
-dns=${sub}.serverkit.pw
-dns2=*.${sub}.serverkit.pw
+dns=${sub}.vipserver.pw
+dns2=*.${sub}.vipserver.pw
 CF_ID=ahmadardhiansyah2020@gmail.com
 CF_KEY=2ddb551a8182951c00608df6f5f2d03b6b54b
 set -euo pipefail
