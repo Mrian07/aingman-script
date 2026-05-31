@@ -33,6 +33,9 @@ cp -r /etc/vless /root/backup/vless &> /dev/null
 cp -r /etc/trojan /root/backup/trojan &> /dev/null
 cp -r /etc/trojan-go /root/backup/trojan-go &> /dev/null
 cp -r /etc/issue.net /root/backup/issue &> /dev/null
+cp -r /etc/zivpn/users.txt /root/backup/zivpn-users &> /dev/null
+cp -r /etc/zivpn/config.json /root/backup/zivpn-config &> /dev/null
+cp -r /etc/zivpn /root/backup/zivpn &> /dev/null
 cd /root
 zip -r $IP-$date.zip backup > /dev/null 2>&1
 rclone copy /root/$IP-$date.zip dr:backup/
