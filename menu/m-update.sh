@@ -130,8 +130,44 @@ fun_bar() {
     echo -e "\033[0;33m]\033[1;37m -\033[1;32m OK !\033[1;37m"
     tput cnorm
 }
-res1() {
 
+install_pipx_gdown() {
+    echo -e "  \033[1;91m Installing pipx and gdown...\033[1;37m"
+
+    export DEBIAN_FRONTEND=noninteractive
+    export PIPX_HOME="/opt/pipx"
+    export PIPX_BIN_DIR="/usr/local/bin"
+
+    apt-get update -y >/dev/null 2>&1
+    apt-get install -y pipx python3-venv python3-pip >/dev/null 2>&1
+
+    mkdir -p "$PIPX_HOME" "$PIPX_BIN_DIR"
+
+    if command -v pipx >/dev/null 2>&1; then
+        pipx install --force gdown >/dev/null 2>&1 || pipx upgrade gdown >/dev/null 2>&1 || true
+    fi
+
+    if ! command -v gdown >/dev/null 2>&1; then
+        if [ -x "/opt/pipx/venvs/gdown/bin/gdown" ]; then
+            ln -sf /opt/pipx/venvs/gdown/bin/gdown /usr/local/bin/gdown
+        elif [ -x "/root/.local/bin/gdown" ]; then
+            ln -sf /root/.local/bin/gdown /usr/local/bin/gdown
+        else
+            python3 -m venv /opt/gdown-env >/dev/null 2>&1
+            /opt/gdown-env/bin/pip install --upgrade pip gdown >/dev/null 2>&1
+            ln -sf /opt/gdown-env/bin/gdown /usr/local/bin/gdown
+        fi
+    fi
+
+    if command -v gdown >/dev/null 2>&1; then
+        echo -e "  \033[1;32m gdown installed successfully!\033[1;37m"
+    else
+        echo -e "  \033[1;31m Failed to install gdown!\033[1;37m"
+    fi
+}
+
+res1() {
+install_pipx_gdown
 wget -q -O /usr/bin/menu "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/menu.sh" && chmod +x /usr/bin/menu
 wget -q -O /usr/bin/m-trgo "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-trgo.sh" && chmod +x /usr/bin/m-trgo
 wget -q -O /usr/bin/m-zivpn "https://raw.githubusercontent.com/Mrian07/aingman-script/main/menu/m-zivpn.sh" && chmod +x /usr/bin/m-zivpn
